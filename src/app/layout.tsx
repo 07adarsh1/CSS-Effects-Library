@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import "@/styles/effects.css";
+import "@/styles/effects-extra.css";
 import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = Geist({
@@ -16,9 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CSS Effects Lab — 48 Curated CSS Effects with Live Demos",
+  title: "CSS Effects Lab — 64 Curated CSS Effects with Live Demos",
   description:
-    "A comprehensive collection of 48 beautiful, production-ready CSS effects across 8 categories. Browse, preview, and copy code instantly.",
+    "A comprehensive collection of 64 beautiful, production-ready CSS effects across 10 categories with favorites, live playground, and export. Browse, preview, and copy code instantly.",
   keywords: [
     "CSS effects",
     "CSS animations",

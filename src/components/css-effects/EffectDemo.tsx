@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
+import { EffectDemoExtra } from './EffectDemoExtra';
 
 interface EffectDemoProps {
   effectId: string;
@@ -441,6 +442,6 @@ export function EffectDemo({ effectId }: EffectDemoProps) {
       );
 
     default:
-      return <div className="flex items-center justify-center h-full text-muted-foreground text-xs">Demo not available</div>;
+      return <EffectDemoExtra effectId={effectId} />;
   }
 }

@@ -7,6 +7,8 @@ export interface CSSEffect {
   htmlCode: string;
 }
 
+import { extraCategories, extraEffects } from './effects-extra-data';
+
 export const categories = [
   { id: 'all', name: 'All Effects', icon: '✦' },
   { id: 'hover', name: 'Hover', icon: '◎' },
@@ -17,6 +19,9 @@ export const categories = [
   { id: 'border', name: 'Border', icon: '□' },
   { id: 'shadow', name: 'Shadow', icon: '◉' },
   { id: 'transition', name: 'Transition', icon: '↝' },
+  { id: 'components', name: 'Components', icon: '⬢' },
+  { id: 'advanced', name: 'Advanced', icon: '◈' },
+  { id: 'favorites', name: 'Favorites', icon: '♥' },
 ] as const;
 
 export type CategoryId = (typeof categories)[number]['id'];
@@ -1573,3 +1578,5 @@ function createRipple(e) {
 </div>`,
   },
 ];
+
+export const allEffects: CSSEffect[] = [...effects, ...extraEffects];

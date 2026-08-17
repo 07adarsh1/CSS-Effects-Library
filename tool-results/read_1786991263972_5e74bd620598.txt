@@ -1,0 +1,1256 @@
+     1→/* ============================================
+     2→   CSS EFFECTS LIBRARY
+     3→   48 Effects across 8 Categories
+     4→   ============================================ */
+     5→
+     6→/* ---------- HOVER EFFECTS ---------- */
+     7→
+     8→/* 1. Fill Slide Up */
+     9→.fx-fill-slide-up {
+    10→  position: relative;
+    11→  overflow: hidden;
+    12→  background: transparent;
+    13→  border: 2px solid #f59e0b;
+    14→  color: #f59e0b;
+    15→  padding: 10px 28px;
+    16→  font-weight: 600;
+    17→ font-size: 14px;
+    18→  cursor: pointer;
+    19→  border-radius: 6px;
+    20→  transition: color 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+    21→  z-index: 1;
+    22→}
+    23→.fx-fill-slide-up::before {
+    24→  content: '';
+    25→  position: absolute;
+    26→  bottom: 0;
+    27→  left: 0;
+    28→  width: 100%;
+    29→  height: 0%;
+    30→  background: #f59e0b;
+    31→  transition: height 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+    32→  z-index: -1;
+    33→}
+    34→.fx-fill-slide-up:hover {
+    35→  color: #000;
+    36→}
+    37→.fx-fill-slide-up:hover::before {
+    38→  height: 100%;
+    39→}
+    40→
+    41→/* 2. Ripple Effect */
+    42→.fx-ripple-wrap {
+    43→  position: relative;
+    44→  overflow: hidden;
+    45→  border-radius: 6px;
+    46→}
+    47→.fx-ripple-btn {
+    48→  background: linear-gradient(135deg, #f59e0b, #ef4444);
+    49→  color: white;
+    50→  padding: 10px 28px;
+    51→  font-weight: 600;
+    52→  font-size: 14px;
+    53→  border: none;
+    54→  border-radius: 6px;
+    55→  cursor: pointer;
+    56→  position: relative;
+    57→  overflow: hidden;
+    58→}
+    59→.fx-ripple {
+    60→  position: absolute;
+    61→  border-radius: 50%;
+    62→  background: rgba(255, 255, 255, 0.5);
+    63→  transform: scale(0);
+    64→  animation: fx-ripple-anim 0.6s ease-out;
+    65→  pointer-events: none;
+    66→}
+    67→@keyframes fx-ripple-anim {
+    68→  to {
+    69→    transform: scale(4);
+    70→    opacity: 0;
+    71→  }
+    72→}
+    73→
+    74→/* 3. Glow Pulse */
+    75→.fx-glow-pulse {
+    76→  padding: 10px 28px;
+    77→  font-weight: 600;
+    78→  font-size: 14px;
+    79→  border: none;
+    80→  border-radius: 6px;
+    81→  cursor: pointer;
+    82→  background: #f59e0b;
+    83→  color: #000;
+    84→  animation: fx-glow-pulse-anim 2s ease-in-out infinite;
+    85→}
+    86→@keyframes fx-glow-pulse-anim {
+    87→  0%, 100% { box-shadow: 0 0 5px #f59e0b, 0 0 10px #f59e0b44; }
+    88→  50% { box-shadow: 0 0 20px #f59e0b, 0 0 40px #f59e0b66, 0 0 60px #f59e0b33; }
+    89→}
+    90→
+    91→/* 4. Lift Shadow */
+    92→.fx-lift-shadow {
+    93→  background: #1e1e1e;
+    94→  border: 1px solid #333;
+    95→  border-radius: 12px;
+    96→  padding: 24px;
+    97→  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    98→              box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    99→  cursor: pointer;
+   100→}
+   101→.fx-lift-shadow:hover {
+   102→  transform: translateY(-8px);
+   103→  box-shadow: 0 20px 40px -12px rgba(245, 158, 11, 0.3),
+   104→              0 8px 16px -8px rgba(0, 0, 0, 0.4);
+   105→}
+   106→
+   107→/* 5. Underline Grow */
+   108→.fx-underline-grow {
+   109→  position: relative;
+   110→  color: #e5e5e5;
+   111→  text-decoration: none;
+   112→  font-weight: 500;
+   113→  font-size: 16px;
+   114→  cursor: pointer;
+   115→}
+   116→.fx-underline-grow::after {
+   117→  content: '';
+   118→  position: absolute;
+   119→  bottom: -4px;
+   120→  left: 50%;
+   121→  width: 0;
+   122→  height: 2px;
+   123→  background: linear-gradient(90deg, #f59e0b, #ef4444);
+   124→  transition: width 0.35s ease, left 0.35s ease;
+   125→}
+   126→.fx-underline-grow:hover::after {
+   127→  width: 100%;
+   128→  left: 0;
+   129→}
+   130→
+   131→/* 6. Border Draw */
+   132→.fx-border-draw {
+   133→  position: relative;
+   134→  padding: 20px 28px;
+   135→  border-radius: 8px;
+   136→  background: transparent;
+   137→  color: #f59e0b;
+   138→  font-weight: 600;
+   139→  font-size: 14px;
+   140→  cursor: pointer;
+   141→  overflow: hidden;
+   142→}
+   143→.fx-border-draw::before {
+   144→  content: '';
+   145→  position: absolute;
+   146→  top: 0; left: 0;
+   147→  width: 3px; height: 0;
+   148→  background: #f59e0b;
+   149→  transition: height 0.3s ease 0s;
+   150→}
+   151→.fx-border-draw::after {
+   152→  content: '';
+   153→  position: absolute;
+   154→  bottom: 0; right: 0;
+   155→  width: 3px; height: 0;
+   156→  background: #f59e0b;
+   157→  transition: height 0.3s ease 0s;
+   158→}
+   159→.fx-border-draw span {
+   160→  position: relative;
+   161→  z-index: 1;
+   162→}
+   163→.fx-border-draw .fx-bd-top {
+   164→  position: absolute;
+   165→  top: 0; right: 0;
+   166→  width: 0; height: 3px;
+   167→  background: #f59e0b;
+   168→  transition: width 0.3s ease 0.3s;
+   169→}
+   170→.fx-border-draw .fx-bd-bottom {
+   171→  position: absolute;
+   172→  bottom: 0; left: 0;
+   173→  width: 0; height: 3px;
+   174→  background: #f59e0b;
+   175→  transition: width 0.3s ease 0.3s;
+   176→}
+   177→.fx-border-draw:hover::before,
+   178→.fx-border-draw:hover::after {
+   179→  height: 100%;
+   180→  transition: height 0.3s ease 0.3s;
+   181→}
+   182→.fx-border-draw:hover .fx-bd-top,
+   183→.fx-border-draw:hover .fx-bd-bottom {
+   184→  width: 100%;
+   185→  transition: width 0.3s ease 0s;
+   186→}
+   187→
+   188→
+   189→/* ---------- LOADING EFFECTS ---------- */
+   190→
+   191→/* 7. Dual Ring Spinner */
+   192→.fx-dual-ring {
+   193→  width: 48px;
+   194→  height: 48px;
+   195→  position: relative;
+   196→}
+   197→.fx-dual-ring::before,
+   198→.fx-dual-ring::after {
+   199→  content: '';
+   200→  position: absolute;
+   201→  border-radius: 50%;
+   202→}
+   203→.fx-dual-ring::before {
+   204→  top: 0; left: 0; right: 0; bottom: 0;
+   205→  border: 3px solid transparent;
+   206→  border-top-color: #f59e0b;
+   207→  animation: fx-spin 1s linear infinite;
+   208→}
+   209→.fx-dual-ring::after {
+   210→  top: 8px; left: 8px; right: 8px; bottom: 8px;
+   211→  border: 3px solid transparent;
+   212→  border-bottom-color: #ef4444;
+   213→  animation: fx-spin-reverse 0.8s linear infinite;
+   214→}
+   215→@keyframes fx-spin {
+   216→  to { transform: rotate(360deg); }
+   217→}
+   218→@keyframes fx-spin-reverse {
+   219→  to { transform: rotate(-360deg); }
+   220→}
+   221→
+   222→/* 8. Bouncing Dots */
+   223→.fx-bouncing-dots {
+   224→  display: flex;
+   225→  gap: 6px;
+   226→  align-items: center;
+   227→  justify-content: center;
+   228→}
+   229→.fx-bouncing-dots span {
+   230→  width: 12px;
+   231→  height: 12px;
+   232→  border-radius: 50%;
+   233→  background: #f59e0b;
+   234→  animation: fx-bounce-dot 1.4s ease-in-out infinite both;
+   235→}
+   236→.fx-bouncing-dots span:nth-child(1) { animation-delay: -0.32s; background: #f59e0b; }
+   237→.fx-bouncing-dots span:nth-child(2) { animation-delay: -0.16s; background: #fb923c; }
+   238→.fx-bouncing-dots span:nth-child(3) { animation-delay: 0s; background: #ef4444; }
+   239→@keyframes fx-bounce-dot {
+   240→  0%, 80%, 100% { transform: scale(0.4); opacity: 0.4; }
+   241→  40% { transform: scale(1); opacity: 1; }
+   242→}
+   243→
+   244→/* 9. Bar Wave */
+   245→.fx-bar-wave {
+   246→  display: flex;
+   247→  gap: 4px;
+   248→  align-items: flex-end;
+   249→  height: 40px;
+   250→}
+   251→.fx-bar-wave span {
+   252→  width: 5px;
+   253→  background: linear-gradient(to top, #f59e0b, #ef4444);
+   254→  border-radius: 3px;
+   255→  animation: fx-bar-wave 1.2s ease-in-out infinite;
+   256→}
+   257→.fx-bar-wave span:nth-child(1) { animation-delay: 0s; height: 20px; }
+   258→.fx-bar-wave span:nth-child(2) { animation-delay: 0.1s; height: 25px; }
+   259→.fx-bar-wave span:nth-child(3) { animation-delay: 0.2s; height: 30px; }
+   260→.fx-bar-wave span:nth-child(4) { animation-delay: 0.3s; height: 25px; }
+   261→.fx-bar-wave span:nth-child(5) { animation-delay: 0.4s; height: 20px; }
+   262→@keyframes fx-bar-wave {
+   263→  0%, 100% { transform: scaleY(0.5); }
+   264→  50% { transform: scaleY(1.2); }
+   265→}
+   266→
+   267→/* 10. Pulse Ring */
+   268→.fx-pulse-ring {
+   269→  position: relative;
+   270→  width: 48px;
+   271→  height: 48px;
+   272→}
+   273→.fx-pulse-ring::before {
+   274→  content: '';
+   275→  position: absolute;
+   276→  inset: 0;
+   277→  border: 3px solid #f59e0b;
+   278→  border-radius: 50%;
+   279→  animation: fx-pulse-ring-anim 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+   280→}
+   281→.fx-pulse-ring::after {
+   282→  content: '';
+   283→  position: absolute;
+   284→  inset: 14px;
+   285→  background: #f59e0b;
+   286→  border-radius: 50%;
+   287→}
+   288→@keyframes fx-pulse-ring-anim {
+   289→  0% { transform: scale(0.5); opacity: 1; }
+   290→  80%, 100% { transform: scale(1.3); opacity: 0; }
+   291→}
+   292→
+   293→/* 11. Square Spin */
+   294→.fx-square-spin {
+   295→  width: 40px;
+   296→  height: 40px;
+   297→  background: #f59e0b;
+   298→  animation: fx-square-spin-anim 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+   299→}
+   300→@keyframes fx-square-spin-anim {
+   301→  0% { transform: rotate(0deg); }
+   302→  25% { transform: rotate(90deg) scale(0.6); border-radius: 50%; }
+   303→  50% { transform: rotate(180deg) scale(1); border-radius: 0; }
+   304→  75% { transform: rotate(270deg) scale(0.6); border-radius: 50%; }
+   305→  100% { transform: rotate(360deg); }
+   306→}
+   307→
+   308→/* 12. Orbit Loader */
+   309→.fx-orbit-loader {
+   310→  width: 48px;
+   311→  height: 48px;
+   312→  position: relative;
+   313→  animation: fx-spin 2s linear infinite;
+   314→}
+   315→.fx-orbit-loader span {
+   316→  position: absolute;
+   317→  width: 10px;
+   318→  height: 10px;
+   319→  border-radius: 50%;
+   320→  background: #f59e0b;
+   321→}
+   322→.fx-orbit-loader span:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
+   323→.fx-orbit-loader span:nth-child(2) { top: 50%; right: 0; transform: translateY(-50%); }
+   324→.fx-orbit-loader span:nth-child(3) { bottom: 0; left: 50%; transform: translateX(-50%); }
+   325→.fx-orbit-loader span:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
+   326→.fx-orbit-loader span:nth-child(2) { background: #fb923c; }
+   327→.fx-orbit-loader span:nth-child(3) { background: #ef4444; }
+   328→.fx-orbit-loader span:nth-child(4) { background: #fbbf24; }
+   329→
+   330→
+   331→/* ---------- TEXT EFFECTS ---------- */
+   332→
+   333→/* 13. Gradient Text */
+   334→.fx-gradient-text {
+   335→  font-size: 28px;
+   336→  font-weight: 800;
+   337→  background: linear-gradient(135deg, #f59e0b, #ef4444, #ec4899, #f59e0b);
+   338→  background-size: 300% 300%;
+   339→  -webkit-background-clip: text;
+   340→  -webkit-text-fill-color: transparent;
+   341→  background-clip: text;
+   342→  animation: fx-gradient-shift 4s ease infinite;
+   343→}
+   344→@keyframes fx-gradient-shift {
+   345→  0% { background-position: 0% 50%; }
+   346→  50% { background-position: 100% 50%; }
+   347→  100% { background-position: 0% 50%; }
+   348→}
+   349→
+   350→/* 14. Glitch Text */
+   351→.fx-glitch {
+   352→  position: relative;
+   353→  font-size: 24px;
+   354→  font-weight: 800;
+   355→  color: #e5e5e5;
+   356→}
+   357→.fx-glitch::before,
+   358→.fx-glitch::after {
+   359→  content: attr(data-text);
+   360→  position: absolute;
+   361→  top: 0;
+   362→  left: 0;
+   363→  width: 100%;
+   364→  height: 100%;
+   365→}
+   366→.fx-glitch::before {
+   367→  color: #ff00ff;
+   368→  animation: fx-glitch-1 2s infinite linear alternate-reverse;
+   369→  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+   370→ transform: translate(-2px);
+   371→}
+   372→.fx-glitch::after {
+   373→  color: #00ffff;
+   374→  animation: fx-glitch-2 3s infinite linear alternate-reverse;
+   375→  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+   376→ transform: translate(2px);
+   377→}
+   378→@keyframes fx-glitch-1 {
+   379→  0% { transform: translate(0); }
+   380→  20% { transform: translate(-3px, 3px); }
+   381→  40% { transform: translate(-3px, -3px); }
+   382→  60% { transform: translate(3px, 3px); }
+   383→  80% { transform: translate(3px, -3px); }
+   384→  100% { transform: translate(0); }
+   385→}
+   386→@keyframes fx-glitch-2 {
+   387→  0% { transform: translate(0); }
+   388→  20% { transform: translate(3px, -3px); }
+   389→  40% { transform: translate(3px, 3px); }
+   390→  60% { transform: translate(-3px, -3px); }
+   391→  80% { transform: translate(-3px, 3px); }
+   392→  100% { transform: translate(0); }
+   393→}
+   394→
+   395→/* 15. Neon Glow Text */
+   396→.fx-neon-text {
+   397→  font-size: 26px;
+   398→  font-weight: 800;
+   399→  color: #f59e0b;
+   400→  text-shadow:
+   401→    0 0 7px #f59e0b,
+   402→    0 0 10px #f59e0b,
+   403→    0 0 21px #f59e0b,
+   404→    0 0 42px #d97706,
+   405→    0 0 82px #d97706,
+   406→    0 0 92px #d97706;
+   407→  animation: fx-neon-flicker 1.5s infinite alternate;
+   408→}
+   409→@keyframes fx-neon-flicker {
+   410→  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+   411→    text-shadow:
+   412→      0 0 7px #f59e0b,
+   413→      0 0 10px #f59e0b,
+   414→      0 0 21px #f59e0b,
+   415→      0 0 42px #d97706,
+   416→      0 0 82px #d97706;
+   417→  }
+   418→  20%, 24%, 55% {
+   419→    text-shadow: none;
+   420→  }
+   421→}
+   422→
+   423→/* 16. Typing Cursor */
+   424→.fx-typing {
+   425→  display: inline-flex;
+   426→  align-items: center;
+   427→  font-size: 18px;
+   428→  font-family: monospace;
+   429→  color: #f59e0b;
+   430→}
+   431→.fx-typing-cursor {
+   432→  display: inline-block;
+   433→  width: 3px;
+   434→  height: 1.2em;
+   435→  background: #f59e0b;
+   436→  margin-left: 2px;
+   437→  animation: fx-blink-cursor 1s step-end infinite;
+   438→}
+   439→@keyframes fx-blink-cursor {
+   440→  0%, 100% { opacity: 1; }
+   441→  50% { opacity: 0; }
+   442→}
+   443→
+   444→/* 17. Text Stroke */
+   445→.fx-text-stroke {
+   446→  font-size: 28px;
+   447→  font-weight: 900;
+   448→  color: transparent;
+   449→  -webkit-text-stroke: 2px #f59e0b;
+   450→  transition: color 0.3s ease, -webkit-text-stroke 0.3s ease;
+   451→  cursor: pointer;
+   452→}
+   453→.fx-text-stroke:hover {
+   454→  color: #f59e0b;
+   455→  -webkit-text-stroke: 2px #f59e0b;
+   456→}
+   457→
+   458→/* 18. Shimmer Text */
+   459→.fx-shimmer-text {
+   460→  font-size: 24px;
+   461→  font-weight: 800;
+   462→  color: #e5e5e5;
+   463→  background: linear-gradient(
+   464→    120deg,
+   465→    #e5e5e5 30%,
+   466→    #f59e0b 50%,
+   467→    #e5e5e5 70%
+   468→  );
+   469→  background-size: 200% 100%;
+   470→  -webkit-background-clip: text;
+   471→  -webkit-text-fill-color: transparent;
+   472→  background-clip: text;
+   473→  animation: fx-shimmer 2s linear infinite;
+   474→}
+   475→@keyframes fx-shimmer {
+   476→  0% { background-position: 200% 0; }
+   477→  100% { background-position: -200% 0; }
+   478→}
+   479→
+   480→
+   481→/* ---------- BACKGROUND EFFECTS ---------- */
+   482→
+   483→/* 19. Animated Gradient Background */
+   484→.fx-bg-animated-gradient {
+   485→  background: linear-gradient(-45deg, #f59e0b, #ef4444, #ec4899, #8b5cf6);
+   486→  background-size: 400% 400%;
+   487→  animation: fx-bg-grad-move 8s ease infinite;
+   488→  width: 100%;
+   489→  height: 100%;
+   490→  border-radius: 8px;
+   491→}
+   492→@keyframes fx-bg-grad-move {
+   493→  0% { background-position: 0% 50%; }
+   494→  50% { background-position: 100% 50%; }
+   495→  100% { background-position: 0% 50%; }
+   496→}
+   497→
+   498→/* 20. Dot Matrix */
+   499→.fx-bg-dot-matrix {
+   500→  background-color: #0a0a0a;
+   501→  background-image:
+   502→    radial-gradient(circle, #f59e0b33 1px, transparent 1px);
+   503→  background-size: 16px 16px;
+   504→  width: 100%;
+   505→  height: 100%;
+   506→  border-radius: 8px;
+   507→  animation: fx-dot-pulse 3s ease-in-out infinite;
+   508→}
+   509→@keyframes fx-dot-pulse {
+   510→  0%, 100% { background-size: 16px 16px; }
+   511→  50% { background-size: 20px 20px; }
+   512→}
+   513→
+   514→/* 21. Diagonal Stripes */
+   515→.fx-bg-stripes {
+   516→  background: repeating-linear-gradient(
+   517→    45deg,
+   518→    #f59e0b22,
+   519→    #f59e0b22 10px,
+   520→    #f59e0b11 10px,
+   521→    #f59e0b11 20px
+   522→  );
+   523→  background-size: 200% 200%;
+   524→  animation: fx-stripe-move 4s linear infinite;
+   525→  width: 100%;
+   526→  height: 100%;
+   527→  border-radius: 8px;
+   528→}
+   529→@keyframes fx-stripe-move {
+   530→  0% { background-position: 0 0; }
+   531→  100% { background-position: 28px 28px; }
+   532→}
+   533→
+   534→/* 22. Aurora */
+   535→.fx-bg-aurora {
+   536→  width: 100%;
+   537→  height: 100%;
+   538→  border-radius: 8px;
+   539→  position: relative;
+   540→  overflow: hidden;
+   541→  background: #0a0a0a;
+   542→}
+   543→.fx-bg-aurora::before,
+   544→.fx-bg-aurora::after {
+   545→  content: '';
+   546→  position: absolute;
+   547→  width: 200%;
+   548→  height: 200%;
+   549→  border-radius: 50%;
+   550→  filter: blur(60px);
+   551→  opacity: 0.5;
+   552→  animation: fx-aurora-move 6s ease-in-out infinite alternate;
+   553→}
+   554→.fx-bg-aurora::before {
+   555→  background: radial-gradient(circle, #f59e0b55, transparent 70%);
+   556→  top: -80%;
+   557→  left: -60%;
+   558→}
+   559→.fx-bg-aurora::after {
+   560→  background: radial-gradient(circle, #10b98155, transparent 70%);
+   561→  bottom: -80%;
+   562→  right: -60%;
+   563→  animation-delay: -3s;
+   564→  animation-direction: alternate-reverse;
+   565→}
+   566→@keyframes fx-aurora-move {
+   567→  0% { transform: translate(0, 0) rotate(0deg); }
+   568→  100% { transform: translate(30%, 30%) rotate(15deg); }
+   569→}
+   570→
+   571→/* 23. Geometric */
+   572→.fx-bg-geometric {
+   573→  width: 100%;
+   574→  height: 100%;
+   575→  border-radius: 8px;
+   576→  background: #0a0a0a;
+   577→  position: relative;
+   578→  overflow: hidden;
+   579→}
+   580→.fx-bg-geometric::before {
+   581→  content: '';
+   582→  position: absolute;
+   583→  inset: -50%;
+   584→  background:
+   585→    linear-gradient(30deg, #f59e0b11 12%, transparent 12.5%, transparent 87%, #f59e0b11 87.5%, #f59e0b11),
+   586→    linear-gradient(150deg, #f59e0b11 12%, transparent 12.5%, transparent 87%, #f59e0b11 87.5%, #f59e0b11),
+   587→    linear-gradient(30deg, #f59e0b11 12%, transparent 12.5%, transparent 87%, #f59e0b11 87.5%, #f59e0b11),
+   588→    linear-gradient(150deg, #f59e0b11 12%, transparent 12.5%, transparent 87%, #f59e0b11 87.5%, #f59e0b11);
+   589→  background-size: 40px 70px;
+   590→  background-position: 0 0, 0 0, 20px 35px, 20px 35px;
+   591→  animation: fx-geo-move 8s linear infinite;
+   592→}
+   593→@keyframes fx-geo-move {
+   594→  0% { transform: rotate(0deg); }
+   595→  100% { transform: rotate(360deg); }
+   596→}
+   597→
+   598→/* 24. Waves */
+   599→.fx-bg-waves {
+   600→  width: 100%;
+   601→  height: 100%;
+   602→  border-radius: 8px;
+   603→  background: linear-gradient(180deg, #0a0a0a, #1a0f00);
+   604→  position: relative;
+   605→  overflow: hidden;
+   606→}
+   607→.fx-bg-waves::before {
+   608→  content: '';
+   609→  position: absolute;
+   610→  bottom: 0;
+   611→  left: -50%;
+   612→  width: 200%;
+   613→  height: 50%;
+   614→  background: radial-gradient(ellipse at center, #f59e0b22 0%, transparent 70%);
+   615→  border-radius: 40%;
+   616→  animation: fx-wave-rotate 6s linear infinite;
+   617→}
+   618→.fx-bg-waves::after {
+   619→  content: '';
+   620→  position: absolute;
+   621→  bottom: 0;
+   622→  left: -50%;
+   623→  width: 200%;
+   624→  height: 45%;
+   625→  background: radial-gradient(ellipse at center, #ef444422 0%, transparent 70%);
+   626→  border-radius: 42%;
+   627→  animation: fx-wave-rotate 8s linear infinite reverse;
+   628→}
+   629→@keyframes fx-wave-rotate {
+   630→  0% { transform: rotate(0deg); }
+   631→  100% { transform: rotate(360deg); }
+   632→}
+   633→
+   634→
+   635→/* ---------- 3D EFFECTS ---------- */
+   636→
+   637→/* 25. Card Flip */
+   638→.fx-card-flip-container {
+   639→  perspective: 800px;
+   640→  width: 140px;
+   641→  height: 90px;
+   642→  cursor: pointer;
+   643→}
+   644→.fx-card-flip {
+   645→  width: 100%;
+   646→  height: 100%;
+   647→  position: relative;
+   648→  transform-style: preserve-3d;
+   649→  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+   650→}
+   651→.fx-card-flip-container:hover .fx-card-flip {
+   652→  transform: rotateY(180deg);
+   653→}
+   654→.fx-card-flip-front,
+   655→.fx-card-flip-back {
+   656→  position: absolute;
+   657→  inset: 0;
+   658→  backface-visibility: hidden;
+   659→  border-radius: 10px;
+   660→  display: flex;
+   661→  align-items: center;
+   662→  justify-content: center;
+   663→  font-weight: 700;
+   664→  font-size: 13px;
+   665→}
+   666→.fx-card-flip-front {
+   667→  background: linear-gradient(135deg, #f59e0b, #d97706);
+   668→  color: #000;
+   669→}
+   670→.fx-card-flip-back {
+   671→  background: linear-gradient(135deg, #ef4444, #dc2626);
+   672→  color: white;
+   673→  transform: rotateY(180deg);
+   674→}
+   675→
+   676→/* 26. Tilt Card */
+   677→.fx-tilt-card {
+   678→  width: 140px;
+   679→  height: 100px;
+   680→  background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+   681→  border: 1px solid #333;
+   682→  border-radius: 12px;
+   683→  padding: 16px;
+   684→  transform: perspective(600px) rotateX(5deg) rotateY(-5deg);
+   685→  transition: transform 0.5s ease;
+   686→  box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+   687→}
+   688→.fx-tilt-card:hover {
+   689→  transform: perspective(600px) rotateX(-5deg) rotateY(5deg);
+   690→  box-shadow: -5px -5px 15px rgba(245, 158, 11, 0.15);
+   691→}
+   692→
+   693→/* 27. 3D Cube */
+   694→.fx-cube-scene {
+   695→  width: 70px;
+   696→  height: 70px;
+   697→  perspective: 300px;
+   698→}
+   699→.fx-cube {
+   700→  width: 100%;
+   701→  height: 100%;
+   702→  position: relative;
+   703→  transform-style: preserve-3d;
+   704→  transform: rotateX(-20deg) rotateY(30deg);
+   705→  animation: fx-cube-rotate 6s ease-in-out infinite;
+   706→}
+   707→.fx-cube-face {
+   708→  position: absolute;
+   709→  width: 70px;
+   710→  height: 70px;
+   711→  border: 2px solid #f59e0b;
+   712→  background: rgba(245, 158, 11, 0.08);
+   713→  display: flex;
+   714→  align-items: center;
+   715→  justify-content: center;
+   716→  font-size: 11px;
+   717→  font-weight: 600;
+   718→  color: #f59e0b;
+   719→  border-radius: 4px;
+   720→}
+   721→.fx-cube-face:nth-child(1) { transform: rotateY(0deg) translateZ(35px); }
+   722→.fx-cube-face:nth-child(2) { transform: rotateY(90deg) translateZ(35px); }
+   723→.fx-cube-face:nth-child(3) { transform: rotateY(180deg) translateZ(35px); }
+   724→.fx-cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(35px); }
+   725→.fx-cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(35px); }
+   726→.fx-cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(35px); }
+   727→@keyframes fx-cube-rotate {
+   728→  0% { transform: rotateX(-20deg) rotateY(30deg); }
+   729→  25% { transform: rotateX(20deg) rotateY(120deg); }
+   730→  50% { transform: rotateX(-20deg) rotateY(210deg); }
+   731→  75% { transform: rotateX(20deg) rotateY(300deg); }
+   732→  100% { transform: rotateX(-20deg) rotateY(390deg); }
+   733→}
+   734→
+   735→/* 28. Depth Stack */
+   736→.fx-depth-stack {
+   737→  position: relative;
+   738→  width: 120px;
+   739→  height: 80px;
+   740→  perspective: 500px;
+   741→}
+   742→.fx-depth-layer {
+   743→  position: absolute;
+   744→  width: 100%;
+   745→  height: 100%;
+   746→  border-radius: 8px;
+   747→  border: 1px solid;
+   748→  transition: transform 0.4s ease;
+   749→}
+   750→.fx-depth-layer:nth-child(1) {
+   751→  background: rgba(245, 158, 11, 0.15);
+   752→  border-color: #f59e0b44;
+   753→  transform: translateZ(0px);
+   754→}
+   755→.fx-depth-layer:nth-child(2) {
+   756→  background: rgba(239, 68, 68, 0.15);
+   757→  border-color: #ef444444;
+   758→  transform: translateZ(-20px) translateX(8px) translateY(8px);
+   759→}
+   760→.fx-depth-layer:nth-child(3) {
+   761→  background: rgba(16, 185, 129, 0.15);
+   762→  border-color: #10b98144;
+   763→  transform: translateZ(-40px) translateX(16px) translateY(16px);
+   764→}
+   765→.fx-depth-stack:hover .fx-depth-layer:nth-child(1) { transform: translateZ(20px) translateX(-16px) translateY(-16px); }
+   766→.fx-depth-stack:hover .fx-depth-layer:nth-child(2) { transform: translateZ(0px) translateX(-8px) translateY(-8px); }
+   767→.fx-depth-stack:hover .fx-depth-layer:nth-child(3) { transform: translateZ(-20px); }
+   768→.fx-depth-stack:hover {
+   769→  transform-style: preserve-3d;
+   770→}
+   771→
+   772→/* 29. Perspective Rotate */
+   773→.fx-perspective-rotate {
+   774→  width: 100px;
+   775→  height: 100px;
+   776→  background: linear-gradient(135deg, #f59e0b, #d97706);
+   777→  border-radius: 12px;
+   778→  animation: fx-persp-rotate 4s ease-in-out infinite;
+   779→  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
+   780→}
+   781→@keyframes fx-persp-rotate {
+   782→  0% { transform: perspective(500px) rotateY(0deg); }
+   783→  25% { transform: perspective(500px) rotateY(90deg); }
+   784→  50% { transform: perspective(500px) rotateY(180deg); }
+   785→  75% { transform: perspective(500px) rotateY(270deg); }
+   786→  100% { transform: perspective(500px) rotateY(360deg); }
+   787→}
+   788→
+   789→/* 30. Swing Door */
+   790→.fx-swing-container {
+   791→  perspective: 600px;
+   792→  width: 120px;
+   793→  height: 90px;
+   794→  cursor: pointer;
+   795→}
+   796→.fx-swing-door {
+   797→  width: 100%;
+   798→  height: 100%;
+   799→  background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+   800→  border: 1px solid #f59e0b44;
+   801→  border-radius: 8px;
+   802→  transform-origin: left center;
+   803→  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+   804→  display: flex;
+   805→  align-items: center;
+   806→  justify-content: center;
+   807→  color: #f59e0b;
+   808→  font-weight: 600;
+   809→  font-size: 13px;
+   810→}
+   811→.fx-swing-container:hover .fx-swing-door {
+   812→  transform: rotateY(-85deg);
+   813→}
+   814→
+   815→
+   816→/* ---------- BORDER EFFECTS ---------- */
+   817→
+   818→/* 31. Gradient Border */
+   819→.fx-gradient-border {
+   820→  position: relative;
+   821→  padding: 20px;
+   822→  border-radius: 10px;
+   823→  background: #111;
+   824→  overflow: hidden;
+   825→}
+   826→.fx-gradient-border::before {
+   827→  content: '';
+   828→  position: absolute;
+   829→  inset: 0;
+   830→  border-radius: 10px;
+   831→  padding: 2px;
+   832→  background: linear-gradient(135deg, #f59e0b, #ef4444, #ec4899, #8b5cf6);
+   833→  background-size: 300% 300%;
+   834→  animation: fx-grad-border-move 4s ease infinite;
+   835→  -webkit-mask:
+   836→    linear-gradient(#fff 0 0) content-box,
+   837→    linear-gradient(#fff 0 0);
+   838→  -webkit-mask-composite: xor;
+   839→  mask-composite: exclude;
+   840→}
+   841→@keyframes fx-grad-border-move {
+   842→  0% { background-position: 0% 50%; }
+   843→  50% { background-position: 100% 50%; }
+   844→  100% { background-position: 0% 50%; }
+   845→}
+   846→
+   847→/* 32. Animated Dashed */
+   848→.fx-animated-dashed {
+   849→  border: 2px dashed #f59e0b;
+   850→  border-radius: 10px;
+   851→  padding: 20px;
+   852→  background: #111;
+   853→  animation: fx-dash-move 1s linear infinite;
+   854→}
+   855→@keyframes fx-dash-move {
+   856→  0% { stroke-dashoffset: 0; }
+   857→  100% { stroke-dashoffset: 20; }
+   858→}
+   859→/* CSS-only animated dashed using background */
+   860→.fx-animated-dashed {
+   861→  border: none;
+   862→  background:
+   863→    repeating-linear-gradient(
+   864→      90deg,
+   865→      #f59e0b 0px,
+   866→      #f59e0b 6px,
+   867→      transparent 6px,
+   868→      transparent 12px
+   869→    ),
+   870→    repeating-linear-gradient(
+   871→      0deg,
+   872→      #f59e0b 0px,
+   873→      #f59e0b 6px,
+   874→      transparent 6px,
+   875→      transparent 12px
+   876→    ),
+   877→    repeating-linear-gradient(
+   878→      90deg,
+   879→      #f59e0b 0px,
+   880→      #f59e0b 6px,
+   881→      transparent 6px,
+   882→      transparent 12px
+   883→    ),
+   884→    repeating-linear-gradient(
+   885→      0deg,
+   886→      #f59e0b 0px,
+   887→      #f59e0b 6px,
+   888→      transparent 6px,
+   889→      transparent 12px
+   890→    );
+   891→  background-size:
+   892→    12px 2px,
+   893→    2px 12px,
+   894→    12px 2px,
+   895→    2px 12px;
+   896→  background-position:
+   897→    0 0,
+   898→    0 0,
+   899→    0 100%,
+   900→    100% 0;
+   901→  background-repeat:
+   902→    repeat-x,
+   903→    repeat-y,
+   904→    repeat-x,
+   905→    repeat-y;
+   906→  padding: 20px;
+   907→  border-radius: 10px;
+   908→  animation: fx-border-march 0.6s linear infinite;
+   909→}
+   910→@keyframes fx-border-march {
+   911→  0% { background-position: 0 0, 0 0, 0 100%, 100% 0; }
+   912→  100% { background-position: 12px 0, 0 12px, -12px 100%, 100% -12px; }
+   913→}
+   914→
+   915→/* 33. Corner Accents */
+   916→.fx-corner-accents {
+   917→  position: relative;
+   918→  padding: 24px;
+   919→  border-radius: 8px;
+   920→  background: #111;
+   921→}
+   922→.fx-corner-accents::before,
+   923→.fx-corner-accents::after {
+   924→  content: '';
+   925→  position: absolute;
+   926→  width: 24px;
+   927→  height: 24px;
+   928→  border-color: #f59e0b;
+   929→  border-style: solid;
+   930→  transition: width 0.3s ease, height 0.3s ease;
+   931→}
+   932→.fx-corner-accents::before {
+   933→  top: -1px;
+   934→  left: -1px;
+   935→  border-width: 3px 0 0 3px;
+   936→  border-radius: 4px 0 0 0;
+   937→}
+   938→.fx-corner-accents::after {
+   939→  bottom: -1px;
+   940→  right: -1px;
+   941→  border-width: 0 3px 3px 0;
+   942→  border-radius: 0 0 4px 0;
+   943→}
+   944→.fx-corner-accents:hover::before,
+   945→.fx-corner-accents:hover::after {
+   946→  width: 40px;
+   947→  height: 40px;
+   948→}
+   949→
+   950→/* 34. Glow Border */
+   951→.fx-glow-border {
+   952→  padding: 20px;
+   953→  border-radius: 10px;
+   954→  border: 1px solid #f59e0b33;
+   955→  background: #111;
+   956→  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+   957→  animation: fx-glow-border-anim 2s ease-in-out infinite;
+   958→}
+   959→@keyframes fx-glow-border-anim {
+   960→  0%, 100% {
+   961→    border-color: #f59e0b44;
+   962→    box-shadow: 0 0 5px #f59e0b22, inset 0 0 5px #f59e0b11;
+   963→  }
+   964→  50% {
+   965→    border-color: #f59e0bcc;
+   966→    box-shadow: 0 0 20px #f59e0b44, 0 0 40px #f59e0b22, inset 0 0 15px #f59e0b11;
+   967→  }
+   968→}
+   969→
+   970→/* 35. Neon Border */
+   971→.fx-neon-border {
+   972→  padding: 20px;
+   973→  border-radius: 10px;
+   974→  border: 2px solid #f59e0b;
+   975→  background: #0a0a0a;
+   976→  box-shadow:
+   977→    0 0 5px #f59e0b,
+   978→    0 0 10px #f59e0b,
+   979→    inset 0 0 5px #f59e0b,
+   980→    inset 0 0 10px #f59e0b33;
+   981→  animation: fx-neon-border-pulse 2s ease-in-out infinite alternate;
+   982→}
+   983→@keyframes fx-neon-border-pulse {
+   984→  0% {
+   985→    box-shadow:
+   986→      0 0 5px #f59e0b,
+   987→      0 0 10px #f59e0b55,
+   988→      inset 0 0 5px #f59e0b55,
+   989→      inset 0 0 10px #f59e0b22;
+   990→  }
+   991→  100% {
+   992→    box-shadow:
+   993→      0 0 10px #f59e0b,
+   994→      0 0 20px #f59e0b,
+   995→      0 0 40px #f59e0b55,
+   996→      inset 0 0 10px #f59e0b,
+   997→      inset 0 0 20px #f59e0b44;
+   998→  }
+   999→}
+  1000→
+  1001→/* 36. Double Border Fade */
+  1002→.fx-double-border {
+  1003→  position: relative;
+  1004→  padding: 20px;
+  1005→  border-radius: 10px;
+  1006→  background: #111;
+  1007→  border: 2px solid #f59e0b33;
+  1008→  outline: 2px solid #f59e0b11;
+  1009→  outline-offset: 4px;
+  1010→  transition: border-color 0.4s ease, outline-color 0.4s ease;
+  1011→}
+  1012→.fx-double-border:hover {
+  1013→  border-color: #f59e0b;
+  1014→  outline-color: #f59e0b55;
+  1015→}
+  1016→
+  1017→
+  1018→/* ---------- SHADOW EFFECTS ---------- */
+  1019→
+  1020→/* 37. Multi Layer Shadow */
+  1021→.fx-multi-shadow {
+  1022→  background: #1e1e1e;
+  1023→  border-radius: 12px;
+  1024→  padding: 24px;
+  1025→  box-shadow:
+  1026→    0 1px 2px rgba(245, 158, 11, 0.1),
+  1027→    0 2px 4px rgba(245, 158, 11, 0.1),
+  1028→    0 4px 8px rgba(245, 158, 11, 0.1),
+  1029→    0 8px 16px rgba(245, 158, 11, 0.1),
+  1030→    0 16px 32px rgba(245, 158, 11, 0.1),
+  1031→    0 32px 64px rgba(245, 158, 11, 0.1);
+  1032→  transition: box-shadow 0.3s ease;
+  1033→}
+  1034→.fx-multi-shadow:hover {
+  1035→  box-shadow:
+  1036→    0 1px 2px rgba(245, 158, 11, 0.15),
+  1037→    0 2px 4px rgba(245, 158, 11, 0.15),
+  1038→    0 4px 8px rgba(245, 158, 11, 0.15),
+  1039→    0 8px 16px rgba(245, 158, 11, 0.15),
+  1040→    0 16px 32px rgba(245, 158, 11, 0.15),
+  1041→    0 32px 64px rgba(245, 158, 11, 0.2);
+  1042→}
+  1043→
+  1044→/* 38. Neon Box Shadow */
+  1045→.fx-neon-box-shadow {
+  1046→  background: #0a0a0a;
+  1047→  border-radius: 12px;
+  1048→  padding: 24px;
+  1049→  border: 1px solid #f59e0b44;
+  1050→  box-shadow:
+  1051→    0 0 5px #f59e0b,
+  1052→    0 0 10px #f59e0b44,
+  1053→    0 0 20px #f59e0b22,
+  1054→    0 0 40px #f59e0b11;
+  1055→  transition: box-shadow 0.3s ease;
+  1056→}
+  1057→.fx-neon-box-shadow:hover {
+  1058→  box-shadow:
+  1059→    0 0 10px #f59e0b,
+  1060→    0 0 20px #f59e0b66,
+  1061→    0 0 40px #f59e0b44,
+  1062→    0 0 80px #f59e0b22;
+  1063→}
+  1064→
+  1065→/* 39. Long Shadow */
+  1066→.fx-long-shadow {
+  1067→  background: #f59e0b;
+  1068→  border-radius: 12px;
+  1069→  padding: 24px;
+  1070→  color: #000;
+  1071→  font-weight: 700;
+  1072→  font-size: 18px;
+  1073→  box-shadow:
+  1074→    1px 1px 0 #b45309,
+  1075→    2px 2px 0 #b45309,
+  1076→    3px 3px 0 #b45309,
+  1077→    4px 4px 0 #b45309,
+  1078→    5px 5px 0 #b45309,
+  1079→    6px 6px 0 #b45309,
+  1080→    7px 7px 0 #b45309,
+  1081→    8px 8px 0 #b45309,
+  1082→    9px 9px 0 #b45309,
+  1083→    10px 10px 0 #b45309;
+  1084→  transition: transform 0.3s ease;
+  1085→}
+  1086→.fx-long-shadow:hover {
+  1087→  transform: translate(-2px, -2px);
+  1088→  box-shadow:
+  1089→    3px 3px 0 #b45309,
+  1090→    4px 4px 0 #b45309,
+  1091→    5px 5px 0 #b45309,
+  1092→    6px 6px 0 #b45309,
+  1093→    7px 7px 0 #b45309,
+  1094→    8px 8px 0 #b45309,
+  1095→    9px 9px 0 #b45309,
+  1096→    10px 10px 0 #b45309,
+  1097→    11px 11px 0 #b45309,
+  1098→    12px 12px 0 #b45309;
+  1099→}
+  1100→
+  1101→/* 40. Shadow Morph */
+  1102→.fx-shadow-morph {
+  1103→  background: #1e1e1e;
+  1104→  border-radius: 12px;
+  1105→  padding: 24px;
+  1106→  animation: fx-shadow-morph-anim 3s ease-in-out infinite;
+  1107→}
+  1108→@keyframes fx-shadow-morph-anim {
+  1109→  0% { box-shadow: 10px 10px 30px #f59e0b44; border-radius: 12px; }
+  1110→  25% { box-shadow: -10px 10px 30px #ef444444; border-radius: 20px 8px; }
+  1111→  50% { box-shadow: -10px -10px 30px #ec489944; border-radius: 8px 20px; }
+  1112→  75% { box-shadow: 10px -10px 30px #8b5cf644; border-radius: 20px; }
+  1113→  100% { box-shadow: 10px 10px 30px #f59e0b44; border-radius: 12px; }
+  1114→}
+  1115→
+  1116→/* 41. Inset Glow */
+  1117→.fx-inset-glow {
+  1118→  background: #111;
+  1119→  border-radius: 12px;
+  1120→  padding: 24px;
+  1121→  box-shadow:
+  1122→    inset 0 0 20px #f59e0b22,
+  1123→    inset 0 0 40px #f59e0b11;
+  1124→  transition: box-shadow 0.4s ease;
+  1125→}
+  1126→.fx-inset-glow:hover {
+  1127→  box-shadow:
+  1128→    inset 0 0 30px #f59e0b44,
+  1129→    inset 0 0 60px #f59e0b22,
+  1130→    inset 0 0 100px #f59e0b11;
+  1131→}
+  1132→
+  1133→/* 42. Colored Shadow */
+  1134→.fx-colored-shadow {
+  1135→  background: #1e1e1e;
+  1136→  border-radius: 12px;
+  1137→  padding: 24px;
+  1138→  box-shadow:
+  1139→    8px 8px 0 #f59e0b,
+  1140→    16px 16px 0 #ef4444,
+  1141→    24px 24px 0 #ec4899;
+  1142→  transition: box-shadow 0.4s ease, transform 0.4s ease;
+  1143→}
+  1144→.fx-colored-shadow:hover {
+  1145→  transform: translate(-4px, -4px);
+  1146→  box-shadow:
+  1147→    12px 12px 0 #f59e0b,
+  1148→    20px 20px 0 #ef4444,
+  1149→    28px 28px 0 #ec4899;
+  1150→}
+  1151→
+  1152→
+  1153→/* ---------- TRANSITION EFFECTS ---------- */
+  1154→
+  1155→/* 43. Smooth Expand */
+  1156→.fx-smooth-expand {
+  1157→  max-height: 0;
+  1158→  overflow: hidden;
+  1159→ transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+  1160→              padding 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+  1161→              opacity 0.5s ease;
+  1162→  opacity: 0;
+  1163→  padding: 0 16px;
+  1164→  background: #1e1e1e;
+  1165→  border-radius: 8px;
+  1166→}
+  1167→.fx-smooth-expand.is-expanded {
+  1168→  max-height: 120px;
+  1169→  opacity: 1;
+  1170→  padding: 16px;
+  1171→}
+  1172→
+  1173→/* 44. Slide Reveal */
+  1174→.fx-slide-reveal-container {
+  1175→  overflow: hidden;
+  1176→  border-radius: 8px;
+  1177→}
+  1178→.fx-slide-reveal {
+  1179→  transform: translateX(100%);
+  1180→  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  1181→  background: linear-gradient(135deg, #f59e0b, #d97706);
+  1182→  padding: 16px 24px;
+  1183→  border-radius: 8px;
+  1184→  color: #000;
+  1185→  font-weight: 600;
+  1186→}
+  1187→.fx-slide-reveal-container:hover .fx-slide-reveal {
+  1188→  transform: translateX(0);
+  1189→}
+  1190→
+  1191→/* 45. Scale Bounce */
+  1192→.fx-scale-bounce {
+  1193→  display: inline-block;
+  1194→  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  1195→  padding: 12px 24px;
+  1196→  border-radius: 8px;
+  1197→  color: white;
+  1198→  font-weight: 600;
+  1199→  cursor: pointer;
+  1200→  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  1201→}
+  1202→.fx-scale-bounce:hover {
+  1203→  transform: scale(1.1);
+  1204→}
+  1205→
+  1206→/* 46. Rotate In */
+  1207→.fx-rotate-in {
+  1208→  display: inline-block;
+  1209→  width: 60px;
+  1210→  height: 60px;
+  1211→  background: linear-gradient(135deg, #f59e0b, #d97706);
+  1212→  border-radius: 12px;
+  1213→  animation: fx-rotate-in-anim 3s ease-in-out infinite;
+  1214→}
+  1215→@keyframes fx-rotate-in-anim {
+  1216→  0% { transform: rotate(-180deg) scale(0); opacity: 0; }
+  1217→  50% { transform: rotate(0deg) scale(1); opacity: 1; }
+  1218→  70% { transform: rotate(0deg) scale(1); opacity: 1; }
+  1219→  100% { transform: rotate(180deg) scale(0); opacity: 0; }
+  1220→}
+  1221→
+  1222→/* 47. Elastic Pop */
+  1223→.fx-elastic-pop {
+  1224→  display: inline-block;
+  1225→  padding: 12px 24px;
+  1226→  background: #1e1e1e;
+  1227→  border: 2px solid #f59e0b;
+  1228→  border-radius: 8px;
+  1229→  color: #f59e0b;
+  1230→  font-weight: 600;
+  1231→  cursor: pointer;
+  1232→  transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  1233→}
+  1234→.fx-elastic-pop:hover {
+  1235→  transform: scale(1.08);
+  1236→}
+  1237→
+  1238→/* 48. Fade Slide Up */
+  1239→.fx-fade-slide-up {
+  1240→  display: inline-block;
+  1241→  animation: fx-fade-slide-anim 3s ease-in-out infinite;
+  1242→}
+  1243→.fx-fade-slide-up-inner {
+  1244→  background: linear-gradient(135deg, #f59e0b22, #ef444422);
+  1245→  border: 1px solid #f59e0b33;
+  1246→  border-radius: 10px;
+  1247→  padding: 16px 24px;
+  1248→  color: #e5e5e5;
+  1249→}
+  1250→@keyframes fx-fade-slide-anim {
+  1251→  0% { transform: translateY(20px); opacity: 0; }
+  1252→  20% { transform: translateY(0); opacity: 1; }
+  1253→  80% { transform: translateY(0); opacity: 1; }
+  1254→  100% { transform: translateY(-20px); opacity: 0; }
+  1255→}
+  1256→
