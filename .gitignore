@@ -46,6 +46,8 @@ next-env.d.ts
 local-*
 .claude
 .z-ai-config
+.zcode
+
 *.log
 dev.log
 dev.out.log

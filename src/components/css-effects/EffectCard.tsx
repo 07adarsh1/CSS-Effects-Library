@@ -2,22 +2,21 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Copy, Check, Code2, ChevronDown, Heart } from 'lucide-react';
+import { Copy, Check, Code2, ChevronDown, Heart, Zap, Sparkles } from 'lucide-react';
 import { CSSEffect } from '@/lib/effects-data';
 import { EffectDemo } from './EffectDemo';
-import { CodeModal } from './CodeModal';
 import { useEffectsStore } from '@/lib/store';
 import { toast } from 'sonner';
 
 interface EffectCardProps {
   effect: CSSEffect;
   index: number;
+  onOpenStudio: (effect: CSSEffect) => void;
 }
 
-export function EffectCard({ effect, index }: EffectCardProps) {
+export function EffectCard({ effect, index, onOpenStudio }: EffectCardProps) {
   const [showCode, setShowCode] = useState(false);
   const [copiedType, setCopiedType] = useState<'css' | 'html' | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
   const isFavorite = useEffectsStore((s) => s.favorites.includes(effect.id));
   const toggleFavorite = useEffectsStore((s) => s.toggleFavorite);
 
@@ -33,128 +32,161 @@ export function EffectCard({ effect, index }: EffectCardProps) {
   };
 
   return (
-    <>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: Math.min(index * 0.03, 0.3) }}
-        className="group relative rounded-xl border border-border/50 bg-card overflow-hidden transition-all duration-300 hover:border-border hover:shadow-lg hover:shadow-amber-500/5"
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: Math.min(index * 0.02, 0.3) }}
+      className="group relative rounded-2xl border border-border/50 bg-card overflow-hidden transition-all duration-300 hover:border-amber-500/40 hover:shadow-xl hover:shadow-amber-500/10 flex flex-col"
+    >
+      {/* Demo Preview Area - Clickable to open Live Studio */}
+      <div
+        onClick={() => onOpenStudio(effect)}
+        className="relative h-48 bg-[#09090c] overflow-hidden cursor-pointer flex items-center justify-center select-none"
+        title="Click to open in Live Interactive Studio"
       >
-        {/* Demo Preview Area */}
-        <div className="relative h-44 bg-[#0a0a0a] overflow-hidden">
-          <EffectDemo effectId={effect.id} />
+        <EffectDemo effectId={effect.id} />
 
-          {/* Hover overlay with View Code + Favorite */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-end justify-between px-3 pb-3 opacity-0 group-hover:opacity-100">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={(e) => { e.stopPropagation(); setModalOpen(true); }}
-              className="flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full text-white text-xs font-medium hover:bg-black/80 transition-colors"
-            >
-              <Code2 className="w-3.5 h-3.5" />
-              View Code
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.15 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={(e) => { e.stopPropagation(); toggleFavorite(effect.id); }}
-              className="flex items-center justify-center w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm hover:bg-black/80 transition-colors"
-              aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-            >
-              <Heart className={`w-3.5 h-3.5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-white'}`} />
-            </motion.button>
-          </div>
+        {/* Top Badges: Category & Live Indicator */}
+        <div className="absolute top-3 left-3 flex items-center gap-1.5">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-400 bg-black/60 backdrop-blur-md border border-white/10 px-2.5 py-0.5 rounded-full shadow-sm">
+            {effect.category}
+          </span>
         </div>
 
-        {/* Info Section */}
-        <div className="p-4">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm text-foreground truncate">
-                {effect.name}
-              </h3>
-              <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
-                {effect.description}
-              </p>
-            </div>
-            <span className="shrink-0 text-[10px] font-medium uppercase tracking-wider text-amber-500/80 bg-amber-500/10 px-2 py-0.5 rounded-full">
-              {effect.category}
-            </span>
-          </div>
+        {/* Favorite Heart Button */}
+        <motion.button
+          whileHover={{ scale: 1.15 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleFavorite(effect.id);
+          }}
+          className="absolute top-3 right-3 flex items-center justify-center w-8 h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/10 hover:bg-black/80 transition-colors z-10"
+          aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+        >
+          <Heart
+            className={`w-3.5 h-3.5 transition-colors ${
+              isFavorite ? 'fill-red-500 text-red-500' : 'text-white/80'
+            }`}
+          />
+        </motion.button>
 
-          {/* Code Toggle + Open Modal */}
-          <div className="mt-3 flex items-center gap-2">
-            <button
-              onClick={() => setShowCode(!showCode)}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        {/* Hover Cue / Live Studio Button Bar */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-200 opacity-0 group-hover:opacity-100 flex items-end justify-between p-3.5">
+          <motion.button
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenStudio(effect);
+            }}
+            className="flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-black px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg shadow-amber-500/25 transition-all"
+          >
+            <Zap className="w-3.5 h-3.5 fill-black" />
+            <span>Open Live Studio</span>
+          </motion.button>
+
+          <span className="text-[11px] text-white/70 bg-black/50 backdrop-blur-sm px-2 py-1 rounded-md border border-white/10">
+            Click to interact & edit
+          </span>
+        </div>
+      </div>
+
+      {/* Info Section */}
+      <div className="p-4 flex-1 flex flex-col justify-between">
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            <h3
+              onClick={() => onOpenStudio(effect)}
+              className="font-bold text-sm text-foreground hover:text-amber-500 transition-colors cursor-pointer truncate"
             >
-              <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-300 ${showCode ? 'rotate-180' : ''}`}
-              />
-              {showCode ? 'Hide' : 'Show'} Code
-            </button>
+              {effect.name}
+            </h3>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+            {effect.description}
+          </p>
+        </div>
+
+        {/* Action Buttons: Show Code, Open Studio, Copy */}
+        <div className="mt-4 pt-3 border-t border-border/40 flex items-center justify-between gap-2">
+          <button
+            onClick={() => setShowCode(!showCode)}
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors font-medium"
+          >
+            <ChevronDown
+              className={`w-3.5 h-3.5 transition-transform duration-300 ${showCode ? 'rotate-180' : ''}`}
+            />
+            {showCode ? 'Hide' : 'Quick'} Code
+          </button>
+
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => setModalOpen(true)}
-              className="text-xs text-muted-foreground hover:text-amber-500 transition-colors ml-auto"
+              onClick={() => onOpenStudio(effect)}
+              className="text-xs text-amber-500 hover:text-amber-400 font-semibold transition-colors flex items-center gap-1"
             >
-              Full view →
+              <Sparkles className="w-3 h-3" /> Live Studio →
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Inline Code Panel */}
-        <AnimatePresence>
-          {showCode && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-              className="overflow-hidden"
-            >
-              <div className="border-t border-border/50 bg-[#0d0d0d]">
-                {/* CSS Code */}
-                <div className="relative">
-                  <div className="flex items-center justify-between px-4 py-2 border-b border-border/30">
-                    <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-500/70">CSS</span>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); copyToClipboard(effect.cssCode, 'css'); }}
-                      className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded hover:bg-white/5"
-                    >
-                      {copiedType === 'css' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                      {copiedType === 'css' ? 'Copied!' : 'Copy'}
-                    </button>
-                  </div>
-                  <pre className="p-4 overflow-x-auto max-h-48 overflow-y-auto text-[11px] leading-relaxed">
-                    <code className="text-foreground/70 font-mono whitespace-pre">{effect.cssCode}</code>
-                  </pre>
-                </div>
-
-                {/* HTML Code */}
-                <div className="relative">
-                  <div className="flex items-center justify-between px-4 py-2 border-t border-border/30">
-                    <span className="text-[10px] font-semibold uppercase tracking-widest text-emerald-500/70">HTML</span>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); copyToClipboard(effect.htmlCode, 'html'); }}
-                      className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded hover:bg-white/5"
-                    >
-                      {copiedType === 'html' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                      {copiedType === 'html' ? 'Copied!' : 'Copy'}
-                    </button>
-                  </div>
-                  <pre className="p-4 overflow-x-auto max-h-32 overflow-y-auto text-[11px] leading-relaxed">
-                    <code className="text-foreground/70 font-mono whitespace-pre">{effect.htmlCode}</code>
-                  </pre>
-                </div>
+      {/* Quick Inline Code Drawer */}
+      <AnimatePresence>
+        {showCode && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            className="overflow-hidden border-t border-border/50 bg-[#0c0c10]"
+          >
+            {/* CSS Code */}
+            <div className="relative">
+              <div className="flex items-center justify-between px-4 py-2 border-b border-border/30 bg-[#121217]">
+                <span className="text-[10px] font-mono font-semibold uppercase tracking-widest text-amber-400">
+                  CSS Rules
+                </span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    copyToClipboard(effect.cssCode, 'css');
+                  }}
+                  className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors px-2 py-0.5 rounded bg-white/5 hover:bg-white/10"
+                >
+                  {copiedType === 'css' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                  {copiedType === 'css' ? 'Copied' : 'Copy'}
+                </button>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
+              <pre className="p-4 overflow-x-auto max-h-40 overflow-y-auto text-[11px] leading-relaxed font-mono text-amber-200/80">
+                <code>{effect.cssCode}</code>
+              </pre>
+            </div>
 
-      {/* Full Code Modal */}
-      <CodeModal effect={effect} open={modalOpen} onClose={() => setModalOpen(false)} />
-    </>
+            {/* HTML Code */}
+            <div className="relative border-t border-border/30">
+              <div className="flex items-center justify-between px-4 py-2 border-b border-border/30 bg-[#121217]">
+                <span className="text-[10px] font-mono font-semibold uppercase tracking-widest text-emerald-400">
+                  HTML Markup
+                </span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    copyToClipboard(effect.htmlCode, 'html');
+                  }}
+                  className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors px-2 py-0.5 rounded bg-white/5 hover:bg-white/10"
+                >
+                  {copiedType === 'html' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                  {copiedType === 'html' ? 'Copied' : 'Copy'}
+                </button>
+              </div>
+              <pre className="p-4 overflow-x-auto max-h-28 overflow-y-auto text-[11px] leading-relaxed font-mono text-emerald-200/80">
+                <code>{effect.htmlCode}</code>
+              </pre>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

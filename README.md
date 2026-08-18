@@ -8,10 +8,10 @@ A curated, interactive CSS & UI Effects Library and Playground with **64+ produc
 
 ## 🚀 Features
 
+- **⚡ Live Interactive Studio for Every Component**: Click any component or card to open a full-featured live interactive studio. Tweak colors, animation speeds, zoom scales, canvas themes, and edit CSS & HTML in real-time with instant hot preview!
 - **64+ Curated CSS Effects**: Hover effects, loading spinners, glowing borders, glassmorphism, 3D cards, text animations, UI components, and advanced effects.
-- **Interactive Live Previews**: Test every effect live directly in your browser.
-- **Interactive CSS Playground**: Edit and customize CSS in real time with instant live preview.
-- **Syntax-Highlighted Code Modal**: Inspect full HTML and CSS implementations with one-click copy buttons.
+- **Interactive CSS Playground**: Preset-enabled live sandbox with dual HTML & CSS editors and split live rendering.
+- **Keyboard Navigation**: Press `←` and `→` in the Live Studio to effortlessly browse and test all 64 effects in interactive mode.
 - **Favorites System**: Save and filter your favorite effects using persistent local storage.
 - **Export All CSS**: Download or copy all 64 CSS effect rules directly for your own projects.
 - **Dark & Light Mode**: Built-in sleek dark theme and crisp light theme.
