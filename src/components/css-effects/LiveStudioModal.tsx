@@ -34,6 +34,7 @@ import {
   ResizablePanel,
   ResizableHandle,
 } from '@/components/ui/resizable';
+import { useTheme } from 'next-themes';
 import { Logo } from './Logo';
 
 interface LiveStudioModalProps {
@@ -516,21 +517,24 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
     `;
   }, [customCss, effect.cssCode, isCustomModified, isHoverSimulated, selectedColor, speedMultiplier]);
 
+  const { resolvedTheme } = useTheme();
+  const isLightSite = resolvedTheme === 'light';
+
   const getCanvasBgClass = () => {
     switch (bgTheme) {
       case 'black':
         return 'bg-black text-white';
       case 'light':
-        return 'bg-slate-100 text-slate-900';
+        return 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100';
       case 'grid':
-        return 'bg-[#09090b] text-white bg-[linear-gradient(to_right,#222227_1px,transparent_1px),linear-gradient(to_bottom,#222227_1px,transparent_1px)] bg-[size:24px_24px]';
+        return 'bg-slate-50 dark:bg-[#09090b] text-slate-900 dark:text-white bg-[linear-gradient(to_right,rgba(0,0,0,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.06)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#222227_1px,transparent_1px),linear-gradient(to_bottom,#222227_1px,transparent_1px)] bg-[size:24px_24px]';
       case 'dots':
-        return 'bg-[#09090b] text-white bg-[radial-gradient(#2d2d34_1.5px,transparent_1.5px)] bg-[size:18px_18px]';
+        return 'bg-slate-50 dark:bg-[#09090b] text-slate-900 dark:text-white bg-[radial-gradient(rgba(0,0,0,0.18)_1.5px,transparent_1.5px)] dark:bg-[radial-gradient(#2d2d34_1.5px,transparent_1.5px)] bg-[size:18px_18px]';
       case 'gradient':
-        return 'bg-gradient-to-br from-slate-950 via-purple-950/40 to-slate-950 text-white';
+        return 'bg-gradient-to-br from-amber-50/80 via-orange-50/50 to-rose-50/80 dark:from-slate-950 dark:via-purple-950/40 dark:to-slate-950 text-slate-900 dark:text-white';
       case 'dark':
       default:
-        return 'bg-[#0a0a0e] text-white';
+        return 'bg-slate-900 dark:bg-[#0a0a0e] text-white';
     }
   };
 
@@ -563,7 +567,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                 zIndex: 50,
               }
         }
-        className={`group/win flex flex-col bg-[#0c0c11] border border-white/15 text-foreground shadow-2xl shadow-black/95 select-none ${
+        className={`group/win flex flex-col bg-background dark:bg-[#0c0c11] border border-border/80 dark:border-white/15 text-foreground shadow-2xl shadow-slate-950/25 dark:shadow-black/95 select-none ${
           isMaximized ? 'rounded-none' : 'rounded-2xl'
         } ${isDraggingOrResizing ? 'transition-none' : 'transition-[top,left,width,height] duration-75 ease-out'}`}
       >
@@ -625,7 +629,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
         <div
           onPointerDown={handleStartHeaderDrag}
           onDoubleClick={toggleMaximize}
-          className={`flex items-center justify-between px-4 sm:px-5 py-2.5 sm:py-3 border-b border-border/40 bg-[#121218] shrink-0 gap-3 select-none ${
+          className={`flex items-center justify-between px-4 sm:px-5 py-2.5 sm:py-3 border-b border-border/60 dark:border-border/40 bg-muted/70 dark:bg-[#121218] shrink-0 gap-3 select-none ${
             isMaximized ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'
           }`}
         >
@@ -650,12 +654,12 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
           {/* Right Window Controls */}
           <div className="flex items-center gap-1.5 shrink-0" onPointerDown={(e) => e.stopPropagation()}>
             {/* Sequential Navigation (< 1/64 >) */}
-            <div className="flex items-center gap-0.5 bg-white/5 border border-white/10 rounded-lg p-0.5">
+            <div className="flex items-center gap-0.5 bg-muted/80 dark:bg-white/5 border border-border/80 dark:border-white/10 rounded-lg p-0.5">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => navigateEffect(-1)}
-                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-white/10"
+                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10"
                 title="Previous Effect (Left Arrow)"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -667,7 +671,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                 variant="ghost"
                 size="icon"
                 onClick={() => navigateEffect(1)}
-                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-white/10"
+                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10"
                 title="Next Effect (Right Arrow)"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -675,12 +679,12 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
             </div>
 
             {/* Split Orientation Toggle */}
-            <div className="hidden sm:flex items-center bg-white/5 border border-white/10 rounded-lg p-0.5">
+            <div className="hidden sm:flex items-center bg-muted/80 dark:bg-white/5 border border-border/80 dark:border-white/10 rounded-lg p-0.5">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setSplitDirection(splitDirection === 'horizontal' ? 'vertical' : 'horizontal')}
-                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-white/10"
+                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10"
                 title={splitDirection === 'horizontal' ? 'Switch to Stacked View' : 'Switch to Side-by-Side View'}
               >
                 {splitDirection === 'horizontal' ? <Columns className="w-3.5 h-3.5" /> : <Rows className="w-3.5 h-3.5" />}
@@ -692,7 +696,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
               variant="ghost"
               size="icon"
               onClick={() => toggleFavorite(effect.id)}
-              className="h-8 w-8 hover:bg-white/10"
+              className="h-8 w-8 hover:bg-muted dark:hover:bg-white/10"
               title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
             >
               <Heart
@@ -707,7 +711,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
               variant="ghost"
               size="icon"
               onClick={toggleMaximize}
-              className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-white/10"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10"
               title={isMaximized ? 'Restore Window' : 'Maximize Window'}
             >
               {isMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -718,7 +722,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-white/10 ml-0.5"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10 ml-0.5"
             >
               <X className="w-4 h-4" />
             </Button>
@@ -735,22 +739,22 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
             className="h-full w-full rounded-none"
           >
             {/* Panel 1: Live Interactive Canvas */}
-            <ResizablePanel defaultSize={58} minSize={25} className="flex flex-col min-h-0 bg-[#0a0a0e]">
+            <ResizablePanel defaultSize={58} minSize={25} className="flex flex-col min-h-0 bg-muted/20 dark:bg-[#0a0a0e]">
               {/* Toolbar Row 1: Themes + Zoom + Speed + Replay */}
-              <div className="flex items-center justify-between px-3 sm:px-4 py-2 bg-[#121218] border-b border-border/30 gap-2 overflow-x-auto scrollbar-none shrink-0">
+              <div className="flex items-center justify-between px-3 sm:px-4 py-2 bg-muted/50 dark:bg-[#121218] border-b border-border/50 dark:border-border/30 gap-2 overflow-x-auto scrollbar-none shrink-0">
                 {/* Canvas Theme Selector */}
                 <div className="flex items-center gap-1.5 shrink-0">
                   <span className="text-[11px] text-muted-foreground font-medium flex items-center gap-1">
                     <Layers className="w-3.5 h-3.5 text-amber-500" /> Canvas:
                   </span>
-                  <div className="flex items-center gap-0.5 bg-black/50 p-0.5 rounded-lg border border-white/10">
+                  <div className="flex items-center gap-0.5 bg-muted/80 dark:bg-black/50 p-0.5 rounded-lg border border-border/80 dark:border-white/10">
                     {(['dark', 'black', 'light', 'grid', 'dots', 'gradient'] as BackgroundTheme[]).map((bg) => (
                       <button
                         key={bg}
                         onClick={() => setBgTheme(bg)}
                         className={`px-2 py-0.5 rounded text-[10px] font-medium capitalize transition-all ${
                           bgTheme === bg
-                            ? 'bg-amber-500 text-black font-semibold shadow-sm'
+                            ? 'bg-amber-500 text-black font-semibold shadow-xs'
                             : 'text-muted-foreground hover:text-foreground'
                         }`}
                       >
@@ -762,14 +766,14 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
 
                 {/* Transformations: Zoom + Speed + Replay */}
                 <div className="flex items-center gap-2 shrink-0">
-                  <div className="flex items-center gap-1 bg-black/50 p-0.5 rounded-lg border border-white/10 text-[10px]">
+                  <div className="flex items-center gap-1 bg-muted/80 dark:bg-black/50 p-0.5 rounded-lg border border-border/80 dark:border-white/10 text-[10px]">
                     <span className="text-muted-foreground pl-1.5 pr-0.5 hidden xs:inline">Zoom:</span>
                     {[0.75, 1, 1.25, 1.5].map((s) => (
                       <button
                         key={s}
                         onClick={() => setScale(s)}
                         className={`px-1.5 py-0.5 rounded transition-all ${
-                          scale === s ? 'bg-white/20 text-white font-semibold' : 'text-muted-foreground hover:text-white'
+                          scale === s ? 'bg-background dark:bg-white/20 text-foreground dark:text-white font-semibold shadow-xs' : 'text-muted-foreground hover:text-foreground'
                         }`}
                       >
                         {s}x
@@ -777,14 +781,14 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                     ))}
                   </div>
 
-                  <div className="flex items-center gap-1 bg-black/50 p-0.5 rounded-lg border border-white/10 text-[10px]">
+                  <div className="flex items-center gap-1 bg-muted/80 dark:bg-black/50 p-0.5 rounded-lg border border-border/80 dark:border-white/10 text-[10px]">
                     <span className="text-muted-foreground pl-1.5 pr-0.5 hidden xs:inline">Speed:</span>
                     {[0.5, 1, 2].map((sp) => (
                       <button
                         key={sp}
                         onClick={() => setSpeedMultiplier(sp)}
                         className={`px-1.5 py-0.5 rounded transition-all ${
-                          speedMultiplier === sp ? 'bg-white/20 text-white font-semibold' : 'text-muted-foreground hover:text-white'
+                          speedMultiplier === sp ? 'bg-background dark:bg-white/20 text-foreground dark:text-white font-semibold shadow-xs' : 'text-muted-foreground hover:text-foreground'
                         }`}
                       >
                         {sp}x
@@ -796,7 +800,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                     variant="ghost"
                     size="icon"
                     onClick={handleReplay}
-                    className="h-7 w-7 text-muted-foreground hover:text-amber-400 hover:bg-white/5"
+                    className="h-7 w-7 text-muted-foreground hover:text-amber-500 hover:bg-muted dark:hover:bg-white/5"
                     title="Replay Animation"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
@@ -805,7 +809,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
               </div>
 
               {/* Toolbar Row 2: Color Palette + Hover Simulator */}
-              <div className="flex items-center justify-between px-3 sm:px-4 py-1.5 bg-[#0f0f15] border-b border-border/20 text-[11px] gap-2 overflow-x-auto scrollbar-none shrink-0">
+              <div className="flex items-center justify-between px-3 sm:px-4 py-1.5 bg-muted/30 dark:bg-[#0f0f15] border-b border-border/40 dark:border-border/20 text-[11px] gap-2 overflow-x-auto scrollbar-none shrink-0">
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-muted-foreground flex items-center gap-1 font-medium text-[11px]">
                     <Palette className="w-3.5 h-3.5 text-amber-500" /> Accent Tint:
@@ -817,7 +821,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                         onClick={() => setSelectedColor(c.hex)}
                         className={`w-4 h-4 rounded-full border transition-all ${
                           selectedColor === c.hex
-                            ? 'scale-125 border-white shadow-sm ring-1 ring-white/50'
+                            ? 'scale-125 border-foreground dark:border-white shadow-xs ring-1 ring-foreground/40 dark:ring-white/50'
                             : 'border-transparent opacity-65 hover:opacity-100 hover:scale-110'
                         }`}
                         style={{ backgroundColor: c.hex }}
@@ -832,8 +836,8 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                     onClick={() => setIsHoverSimulated(!isHoverSimulated)}
                     className={`px-2.5 py-1 rounded-lg border text-[11px] font-medium transition-all flex items-center gap-1.5 ${
                       isHoverSimulated
-                        ? 'bg-amber-500/20 border-amber-500/60 text-amber-400 shadow-sm shadow-amber-500/10'
-                        : 'border-white/10 text-muted-foreground hover:text-white hover:bg-white/5'
+                        ? 'bg-amber-500/20 border-amber-500/60 text-amber-600 dark:text-amber-400 shadow-xs'
+                        : 'border-border/80 dark:border-white/10 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/5'
                     }`}
                   >
                     <Sparkles className="w-3 h-3" />
@@ -873,7 +877,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                 </div>
 
                 {/* Bottom Sandbox Live Badge */}
-                <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[10px] text-muted-foreground pointer-events-none">
+                <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-background/80 dark:bg-black/60 backdrop-blur-md border border-border/80 dark:border-white/10 text-[10px] text-foreground/80 dark:text-muted-foreground pointer-events-none">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span>Live Sandbox &middot; click / hover to test</span>
                 </div>
@@ -887,39 +891,39 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
             />
 
             {/* Panel 2: Multi-tab Inspector & Realtime Code Editor */}
-            <ResizablePanel defaultSize={42} minSize={25} className="flex flex-col bg-[#0c0c11] min-h-0 overflow-hidden">
+            <ResizablePanel defaultSize={42} minSize={25} className="flex flex-col bg-card dark:bg-[#0c0c11] min-h-0 overflow-hidden">
               <Tabs
                 value={activeTab}
                 onValueChange={(v) => setActiveTab(v as any)}
                 className="flex flex-col h-full min-h-0"
               >
                 {/* Tabs Header with Responsive Flow */}
-                <div className="p-2 border-b border-border/30 bg-[#121218] shrink-0">
-                  <TabsList className="flex items-center justify-between w-full bg-white/5 border border-white/10 h-8 p-0.5 rounded-lg overflow-x-auto scrollbar-none gap-0.5">
+                <div className="p-2 border-b border-border/50 dark:border-border/30 bg-muted/50 dark:bg-[#121218] shrink-0">
+                  <TabsList className="flex items-center justify-between w-full bg-muted/80 dark:bg-white/5 border border-border/80 dark:border-white/10 h-8 p-0.5 rounded-lg overflow-x-auto scrollbar-none gap-0.5">
                     <TabsTrigger
                       value="overview"
-                      className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-amber-500 data-[state=active]:text-black font-semibold flex items-center justify-center gap-1 min-w-[70px]"
+                      className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-amber-500 data-[state=active]:text-black text-muted-foreground font-semibold flex items-center justify-center gap-1 min-w-[70px]"
                     >
                       <Sliders className="w-3 h-3 shrink-0" />
                       <span className="truncate">Overview</span>
                     </TabsTrigger>
                     <TabsTrigger
                       value="css-editor"
-                      className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-amber-500 data-[state=active]:text-black font-semibold flex items-center justify-center gap-1 min-w-[70px]"
+                      className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-amber-500 data-[state=active]:text-black text-muted-foreground font-semibold flex items-center justify-center gap-1 min-w-[70px]"
                     >
                       <Terminal className="w-3 h-3 shrink-0" />
                       <span className="truncate">Live CSS</span>
                     </TabsTrigger>
                     <TabsTrigger
                       value="html-editor"
-                      className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-emerald-500 data-[state=active]:text-black font-semibold flex items-center justify-center gap-1 min-w-[70px]"
+                      className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-emerald-500 data-[state=active]:text-black text-muted-foreground font-semibold flex items-center justify-center gap-1 min-w-[70px]"
                     >
                       <Code2 className="w-3 h-3 shrink-0" />
                       <span className="truncate">Live HTML</span>
                     </TabsTrigger>
                     <TabsTrigger
                       value="syntax"
-                      className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-white/20 data-[state=active]:text-white font-semibold flex items-center justify-center gap-1 min-w-[70px]"
+                      className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-foreground/15 dark:data-[state=active]:bg-white/20 data-[state=active]:text-foreground dark:data-[state=active]:text-white text-muted-foreground font-semibold flex items-center justify-center gap-1 min-w-[70px]"
                     >
                       <Eye className="w-3 h-3 shrink-0" />
                       <span className="truncate">Full Code</span>
@@ -930,7 +934,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                 {/* TAB 1: Overview & 1-Click Code Actions */}
                 <TabsContent value="overview" className="flex-1 flex flex-col p-4 space-y-3.5 overflow-y-auto m-0 min-h-0">
                   {/* Metadata Box */}
-                  <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-2">
+                  <div className="p-3.5 rounded-xl bg-muted/30 dark:bg-white/[0.03] border border-border/80 dark:border-white/10 space-y-2">
                     <div className="flex items-center justify-between gap-2">
                       <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                         <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Effect Details
@@ -938,7 +942,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                       {isCustomModified && (
                         <button
                           onClick={handleResetCode}
-                          className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20"
+                          className="text-[10px] text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-300 flex items-center gap-1 font-medium bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20"
                         >
                           <RotateCcw className="w-2.5 h-2.5" /> Reset Code
                         </button>
@@ -948,11 +952,11 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                       {effect.description}
                     </p>
                     <div className="flex flex-wrap gap-2 pt-1 text-[11px]">
-                      <span className="px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-muted-foreground">
-                        Category: <b className="text-amber-400 capitalize">{effect.category}</b>
+                      <span className="px-2.5 py-0.5 rounded-md bg-muted/70 dark:bg-white/5 border border-border/80 dark:border-white/10 text-muted-foreground">
+                        Category: <b className="text-amber-500 dark:text-amber-400 capitalize">{effect.category}</b>
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-muted-foreground">
-                        ID: <code className="text-emerald-400 font-mono">{effect.id}</code>
+                      <span className="px-2.5 py-0.5 rounded-md bg-muted/70 dark:bg-white/5 border border-border/80 dark:border-white/10 text-muted-foreground">
+                        ID: <code className="text-emerald-600 dark:text-emerald-400 font-mono">{effect.id}</code>
                       </span>
                     </div>
                   </div>
@@ -960,9 +964,9 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                   {/* 1-Click Code Copy Cards */}
                   <div className="space-y-2.5">
                     {/* CSS Card */}
-                    <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <div className="p-3.5 rounded-xl bg-muted/30 dark:bg-white/[0.03] border border-border/80 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                       <div className="min-w-0">
-                        <div className="text-xs font-bold text-amber-400">CSS Stylesheet Rules</div>
+                        <div className="text-xs font-bold text-amber-500 dark:text-amber-400">CSS Stylesheet Rules</div>
                         <div className="text-[11px] text-muted-foreground mt-0.5">
                           Pure CSS class definition & keyframe animations
                         </div>
@@ -978,9 +982,9 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                     </div>
 
                     {/* HTML Card */}
-                    <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <div className="p-3.5 rounded-xl bg-muted/30 dark:bg-white/[0.03] border border-border/80 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                       <div className="min-w-0">
-                        <div className="text-xs font-bold text-emerald-400">HTML Element Markup</div>
+                        <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400">HTML Element Markup</div>
                         <div className="text-[11px] text-muted-foreground mt-0.5">
                           Semantic HTML tag with corresponding classes
                         </div>
@@ -989,7 +993,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                         size="sm"
                         variant="outline"
                         onClick={() => copyToClipboard(customHtml, 'html')}
-                        className="h-8 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 text-xs font-bold gap-1.5 shrink-0 self-start sm:self-center"
+                        className="h-8 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 text-xs font-bold gap-1.5 shrink-0 self-start sm:self-center"
                       >
                         {copiedType === 'html' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                         {copiedType === 'html' ? 'Copied!' : 'Copy HTML'}
@@ -998,8 +1002,8 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                   </div>
 
                   {/* Integration Tip */}
-                  <div className="p-3.5 rounded-xl bg-amber-500/5 border border-amber-500/20 text-xs text-amber-200/90 space-y-1">
-                    <div className="font-semibold text-amber-400 flex items-center gap-1.5">
+                  <div className="p-3.5 rounded-xl bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/30 dark:border-amber-500/20 text-xs text-amber-900 dark:text-amber-200/90 space-y-1">
+                    <div className="font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
                       💡 8-Direction Resizing & Dragging:
                     </div>
                     <p className="text-[11px] leading-relaxed text-muted-foreground">
@@ -1010,15 +1014,15 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
 
                 {/* TAB 2: Live Editable CSS */}
                 <TabsContent value="css-editor" className="flex-1 flex flex-col min-h-0 m-0">
-                  <div className="flex items-center justify-between px-4 py-2 border-b border-border/30 bg-[#121218]">
-                    <div className="text-[11px] text-amber-400 font-mono flex items-center gap-1.5">
+                  <div className="flex items-center justify-between px-4 py-2 border-b border-border/50 dark:border-border/30 bg-muted/60 dark:bg-[#121218]">
+                    <div className="text-[11px] text-amber-500 dark:text-amber-400 font-mono flex items-center gap-1.5">
                       <Terminal className="w-3.5 h-3.5" /> Realtime CSS Editor
                     </div>
                     <div className="flex items-center gap-2">
                       {isCustomModified && (
                         <button
                           onClick={handleResetCode}
-                          className="text-[10px] text-muted-foreground hover:text-amber-400 flex items-center gap-1"
+                          className="text-[10px] text-muted-foreground hover:text-amber-500 flex items-center gap-1"
                         >
                           <RotateCcw className="w-2.5 h-2.5" /> Reset
                         </button>
@@ -1027,7 +1031,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                         size="sm"
                         variant="ghost"
                         onClick={() => copyToClipboard(customCss, 'css')}
-                        className="h-6 text-[10px] text-muted-foreground hover:text-white px-2"
+                        className="h-6 text-[10px] text-muted-foreground hover:text-foreground px-2"
                       >
                         {copiedType === 'css' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                         Copy CSS
@@ -1041,22 +1045,22 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                       setIsCustomModified(true);
                     }}
                     spellCheck={false}
-                    className="flex-1 w-full bg-[#08080c] text-amber-200/90 p-4 font-mono text-xs leading-relaxed resize-none focus:outline-none border-none overflow-y-auto selection:bg-amber-500/30"
+                    className="flex-1 w-full bg-slate-950 text-amber-300 dark:text-amber-200/90 p-4 font-mono text-xs leading-relaxed resize-none focus:outline-none border-none overflow-y-auto selection:bg-amber-500/30"
                     placeholder="Type or paste CSS rules here..."
                   />
                 </TabsContent>
 
                 {/* TAB 3: Live Editable HTML */}
                 <TabsContent value="html-editor" className="flex-1 flex flex-col min-h-0 m-0">
-                  <div className="flex items-center justify-between px-4 py-2 border-b border-border/30 bg-[#121218]">
-                    <div className="text-[11px] text-emerald-400 font-mono flex items-center gap-1.5">
+                  <div className="flex items-center justify-between px-4 py-2 border-b border-border/50 dark:border-border/30 bg-muted/60 dark:bg-[#121218]">
+                    <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono flex items-center gap-1.5">
                       <Code2 className="w-3.5 h-3.5" /> Realtime HTML Editor
                     </div>
                     <div className="flex items-center gap-2">
                       {isCustomModified && (
                         <button
                           onClick={handleResetCode}
-                          className="text-[10px] text-muted-foreground hover:text-emerald-400 flex items-center gap-1"
+                          className="text-[10px] text-muted-foreground hover:text-emerald-500 flex items-center gap-1"
                         >
                           <RotateCcw className="w-2.5 h-2.5" /> Reset
                         </button>
@@ -1065,7 +1069,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                         size="sm"
                         variant="ghost"
                         onClick={() => copyToClipboard(customHtml, 'html')}
-                        className="h-6 text-[10px] text-muted-foreground hover:text-white px-2"
+                        className="h-6 text-[10px] text-muted-foreground hover:text-foreground px-2"
                       >
                         {copiedType === 'html' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                         Copy HTML
@@ -1079,7 +1083,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                       setIsCustomModified(true);
                     }}
                     spellCheck={false}
-                    className="flex-1 w-full bg-[#08080c] text-emerald-200/90 p-4 font-mono text-xs leading-relaxed resize-none focus:outline-none border-none overflow-y-auto selection:bg-emerald-500/30"
+                    className="flex-1 w-full bg-slate-950 text-emerald-300 dark:text-emerald-200/90 p-4 font-mono text-xs leading-relaxed resize-none focus:outline-none border-none overflow-y-auto selection:bg-emerald-500/30"
                     placeholder="Type or paste HTML markup here..."
                   />
                 </TabsContent>
