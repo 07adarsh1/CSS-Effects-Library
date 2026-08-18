@@ -13,11 +13,6 @@
       <stop offset="50%" stop-color="#818cf8" />
       <stop offset="100%" stop-color="#c084fc" />
     </linearGradient>
-
-    <!-- Subtle Drop Shadow -->
-    <filter id="csshub-shadow" x="-10%" y="-10%" width="130%" height="130%">
-      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000000" flood-opacity="0.4" />
-    </filter>
   </defs>
 
   <!-- Back Layer: Tilted Vibrant Gradient Squircle -->
@@ -41,7 +36,6 @@
     fill="#09090f"
     stroke="#ffffff"
     stroke-width="7"
-    filter="url(#csshub-shadow)"
   />
 
   <!-- Code Brackets & Slash -->

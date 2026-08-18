@@ -17,9 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CSSHUB — 64+ Curated CSS Effects with Live Studio",
+  title: "CSSHUB — 72+ Curated CSS Effects with Live Studio",
   description:
-    "CSSHUB: A modern library of 64+ beautiful, production-ready CSS effects with 8-way resizable Live Studio, real-time code editing, and 1-click export. Browse, customize, and copy code instantly.",
+    "CSSHUB: A modern library of 72+ beautiful, production-ready CSS effects with 8-way resizable Live Studio, real-time code editing, and 1-click export. Browse, customize, and copy code instantly.",
   keywords: [
     "CSS effects",
     "CSS animations",
@@ -33,7 +33,11 @@ export const metadata: Metadata = {
     "CSS code",
   ],
   icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
+    icon: [
+      { url: "/logo.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/logo.svg",
+    apple: "/logo.svg",
   },
 };
 

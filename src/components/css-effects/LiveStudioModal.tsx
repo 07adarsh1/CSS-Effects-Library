@@ -34,6 +34,7 @@ import {
   ResizablePanel,
   ResizableHandle,
 } from '@/components/ui/resizable';
+import { Logo } from './Logo';
 
 interface LiveStudioModalProps {
   effect: CSSEffect | null;
@@ -291,13 +292,119 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
   const handleSandboxClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
 
-    // Toggle switch simulation
-    const toggleEl = target.closest('.toggle-switch, .switch-toggle, .custom-toggle');
-    if (toggleEl) {
-      toggleEl.classList.toggle('active');
+    // 1. Toggle switch simulation (card or direct switch)
+    const toggleCard = target.closest('.toggle-card, .fx-toggle-card');
+    if (toggleCard) {
+      const sw = toggleCard.querySelector('.toggle-switch, .fx-toggle-switch');
+      if (sw) sw.classList.toggle('active');
+      return;
     }
 
-    // Ripple effect simulation
+    const toggleEl = target.closest('.toggle-switch, .switch-toggle, .custom-toggle, .fx-toggle-switch');
+    if (toggleEl) {
+      toggleEl.classList.toggle('active');
+      return;
+    }
+
+    // 2. Accordion expand / collapse
+    const accordionEl = target.closest('.accordion-item, .fx-accordion-item, .accordion-header');
+    if (accordionEl) {
+      const item = accordionEl.classList.contains('accordion-item') || accordionEl.classList.contains('fx-accordion-item')
+        ? accordionEl
+        : accordionEl.closest('.accordion-item, .fx-accordion-item');
+      if (item) {
+        item.classList.toggle('open');
+      }
+      return;
+    }
+
+    // 3. Sliding tabs selection
+    const tabEl = target.closest('.tab-item, .fx-tab-item, .sliding-tabs button, .fx-sliding-tabs button');
+    if (tabEl) {
+      const parent = tabEl.parentElement;
+      if (parent) {
+        parent.querySelectorAll('.tab-item, .fx-tab-item, button').forEach((btn) => {
+          btn.classList.remove('active');
+        });
+        tabEl.classList.add('active');
+      }
+      return;
+    }
+
+    // 4. Rating stars
+    const starBtn = target.closest('.star-btn, .fx-star-btn, .star, .rating-star');
+    if (starBtn) {
+      const parent = starBtn.parentElement;
+      if (parent) {
+        const stars = Array.from(parent.querySelectorAll('.star-btn, .fx-star-btn, .star, .rating-star'));
+        const idx = stars.indexOf(starBtn);
+        if (idx !== -1) {
+          stars.forEach((s, i) => {
+            if (i <= idx) {
+              s.classList.add('filled', 'active');
+            } else {
+              s.classList.remove('filled', 'active');
+            }
+          });
+        }
+      }
+      return;
+    }
+
+    // 5. Step progress tracker nodes
+    const stepNode = target.closest('.step-node, .fx-step-node');
+    if (stepNode) {
+      const tracker = stepNode.closest('.step-tracker, .fx-step-tracker');
+      if (tracker) {
+        const nodes = Array.from(tracker.querySelectorAll('.step-node, .fx-step-node'));
+        const lines = Array.from(tracker.querySelectorAll('.step-line, .fx-step-line'));
+        const clickedIdx = nodes.indexOf(stepNode);
+        if (clickedIdx !== -1) {
+          nodes.forEach((n, i) => {
+            if (i < clickedIdx) {
+              n.className = 'step-node completed';
+              n.textContent = '✓';
+            } else if (i === clickedIdx) {
+              n.className = 'step-node active';
+              n.textContent = `${i + 1}`;
+            } else {
+              n.className = 'step-node';
+              n.textContent = `${i + 1}`;
+            }
+          });
+          lines.forEach((l, i) => {
+            if (i < clickedIdx) {
+              l.className = 'step-line filled';
+            } else {
+              l.className = 'step-line';
+            }
+          });
+        }
+      }
+      return;
+    }
+
+    // 6. Checkbox auto-toggle (labels handle native toggle; only handle non-label wrappers)
+    const checkboxWrap = target.closest('.checkbox-card, .checkbox-anim, .fx-checkbox-anim');
+    if (checkboxWrap) {
+      if (!target.closest('label')) {
+        const input = checkboxWrap.querySelector('input[type="checkbox"]') as HTMLInputElement;
+        if (input && target !== input) {
+          input.checked = !input.checked;
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+      return;
+    }
+
+    // 7. 3D Flip Card toggle
+    const flipCard = target.closest('.perspective-card, .flip-card, .fx-flip-card');
+    if (flipCard) {
+      flipCard.classList.toggle('flipped');
+      return;
+    }
+
+    // 8. Ripple effect simulation
     const rippleBtn = target.closest('.ripple-btn, .fx-ripple-btn, .fill-slide-up, button');
     if (rippleBtn && effect.id.includes('ripple')) {
       const rect = rippleBtn.getBoundingClientRect();
@@ -315,6 +422,53 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
       circle.style.pointerEvents = 'none';
       rippleBtn.appendChild(circle);
       setTimeout(() => circle.remove(), 600);
+      return;
+    }
+  };
+
+  // Interactive mouse move tracking (spotlights & 3D tilt)
+  const handleSandboxMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const spotlightEl = (e.target as HTMLElement).closest(
+      '.card-spotlight, .bento-card, .fx-card-spotlight, .fx-bento-card, [data-spotlight]'
+    ) as HTMLElement;
+    if (spotlightEl) {
+      const rect = spotlightEl.getBoundingClientRect();
+      spotlightEl.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+      spotlightEl.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+    }
+  };
+
+  // Interactive OTP / Input key handling
+  const handleSandboxInput = (e: React.FormEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLInputElement;
+
+    // Range slider dynamic track update
+    if (target.type === 'range' || target.classList?.contains('range-slider') || target.classList?.contains('fx-range-slider')) {
+      target.style.backgroundSize = `${target.value}% 100%`;
+    }
+
+    // OTP box auto advance
+    if (target.classList?.contains('otp-box') || target.classList?.contains('fx-otp-box')) {
+      if (target.value.length >= 1) {
+        const next = target.nextElementSibling as HTMLInputElement;
+        if (next && next.tagName === 'INPUT') {
+          next.focus();
+          next.select();
+        }
+      }
+    }
+  };
+
+  const handleSandboxKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLInputElement;
+    if (target.classList?.contains('otp-box') || target.classList?.contains('fx-otp-box')) {
+      if (e.key === 'Backspace' && !target.value) {
+        const prev = target.previousElementSibling as HTMLInputElement;
+        if (prev && prev.tagName === 'INPUT') {
+          prev.focus();
+          prev.select();
+        }
+      }
     }
   };
 
@@ -337,10 +491,23 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
       #live-studio-canvas-root {
         --live-accent: ${selectedColor};
         --live-speed: ${speedMultiplier};
+        box-sizing: border-box;
       }
-      #live-studio-canvas-root * {
+      #live-studio-canvas-root *,
+      #live-studio-canvas-root *::before,
+      #live-studio-canvas-root *::after {
+        box-sizing: border-box;
         animation-duration: calc(var(--base-duration, 1s) / ${speedMultiplier});
         transition-duration: calc(var(--base-transition, 0.35s) / ${speedMultiplier});
+      }
+      #live-studio-canvas-root input,
+      #live-studio-canvas-root textarea,
+      #live-studio-canvas-root select,
+      #live-studio-canvas-root button {
+        font-family: inherit;
+      }
+      .live-interactive-sandbox-render > * {
+        flex-shrink: 0;
       }
       @keyframes fx-ripple-animation {
         to { transform: scale(4); opacity: 0; }
@@ -464,9 +631,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
         >
           {/* Left Title */}
           <div className="flex items-center gap-3 min-w-0 pointer-events-none">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 text-black font-bold shadow-md shadow-amber-500/20 shrink-0">
-              <Zap className="w-4 h-4 text-white" />
-            </div>
+            <Logo size={32} />
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <h2 className="text-sm sm:text-base font-bold text-foreground truncate tracking-tight">
@@ -682,7 +847,10 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                 id="live-studio-canvas-root"
                 key={`canvas-${renderKey}-${effect.id}`}
                 onClick={handleSandboxClick}
-                className={`relative flex-1 flex items-center justify-center p-6 sm:p-10 overflow-auto transition-colors duration-300 select-none min-h-[220px] ${getCanvasBgClass()}`}
+                onMouseMove={handleSandboxMouseMove}
+                onInput={handleSandboxInput}
+                onKeyDown={handleSandboxKeyDown}
+                className={`relative flex-1 flex items-center justify-center p-6 sm:p-10 overflow-auto transition-colors duration-300 min-h-[220px] ${getCanvasBgClass()}`}
               >
                 {/* Injected Scoped Styles */}
                 <style dangerouslySetInnerHTML={{ __html: previewScopedCss }} />

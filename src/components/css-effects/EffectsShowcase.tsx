@@ -28,6 +28,7 @@ import { Input } from '@/components/ui/input';
 import { BackToTop } from './BackToTop';
 import { FeatureBar } from './FeatureBar';
 import { LiveStudioModal } from './LiveStudioModal';
+import { Logo } from './Logo';
 import { useEffectsStore } from '@/lib/store';
 import { toast } from 'sonner';
 
@@ -152,9 +153,7 @@ export function EffectsShowcase() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-md shadow-amber-500/20">
-                <Palette className="w-4 h-4 text-white" />
-              </div>
+              <Logo size={32} />
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-base tracking-tight text-foreground">CSSHUB</span>
                 <span className="hidden sm:inline text-[10px] font-semibold bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2 py-0.5 rounded-full">
@@ -204,8 +203,11 @@ export function EffectsShowcase() {
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-6"
             >
-              {/* Radiant Headline */}
+              {/* Radiant Headline with Logo */}
               <div className="relative">
+                <div className="flex justify-center mb-5">
+                  <Logo size={68} className="drop-shadow-[0_12px_32px_rgba(0,166,255,0.45)]" />
+                </div>
                 <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-none select-none">
                   <span className="bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 bg-clip-text text-transparent drop-shadow-[0_0_45px_rgba(245,158,11,0.45)]">
                     CSSHUB
@@ -474,9 +476,7 @@ export function EffectsShowcase() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
-                <Palette className="w-3 h-3 text-white" />
-              </div>
+              <Logo size={24} />
               <span className="text-sm font-semibold">CSSHUB</span>
             </div>
             <p className="text-xs text-muted-foreground">

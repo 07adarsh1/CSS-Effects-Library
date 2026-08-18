@@ -1,6 +1,6 @@
 # CSSHUB 🎨✨
 
-A curated, interactive CSS & UI Effects Library and Live Studio with **64+ production-ready CSS effects** across 10 categories, built with Next.js 16, React 19, Tailwind CSS, and Framer Motion.
+A curated, interactive CSS & UI Effects Library and Live Studio with **72+ production-ready CSS effects** across 10 categories, built with Next.js 16, React 19, Tailwind CSS, and Framer Motion.
 
 ![CSSHUB Showcase Preview](public/screenshots/csshub-hero.png)
 
@@ -39,7 +39,7 @@ A curated, interactive CSS & UI Effects Library and Live Studio with **64+ produ
 
 ---
 
-## 🗂️ Effect Categories (64+ Effects)
+## 🗂️ Effect Categories (72+ Production-Ready Effects)
 
 1. **Hover Effects**: Glow, Underline Reveal, Lift, Border Expand, Shine Sweep, Tilt, 3D Flip, Neon Pulse
 2. **Loading Spinners**: Dual Ring, Ripple Pulse, Dot Bounce, Orbit, Gradient Spinner, Bar Wave, Infinity Loop, Hourglass
@@ -49,7 +49,7 @@ A curated, interactive CSS & UI Effects Library and Live Studio with **64+ produ
 6. **Borders**: Gradient Border, Dashed March, Corner Accents, Snake Border, Rainbow Glow, Double Offset, Pulsing Border, Neon Frame
 7. **Shadows**: Neumorphic, Multi-Layer Depth, Colored Glow, Inner Depth, Long Shadow, Floating Shadow, Prism Shadow, Inset Glow
 8. **Transitions**: Slide Reveal, Curtain Open, Zoom Bounce, Elastic Pop, Page Curl, Diagonal Wipe, Morph Shape, Spring In
-9. **Components**: Toggle Switch, Checkbox Animation, Circular Progress, Skeleton Loader, Tooltip, Badge Pulse, Rating Stars, Range Slider
+9. **Components (16 Components)**: Floating Label Input, Sliding Pill Tab Bar, Animated Accordion, Step Progress Tracker, Notification Toast, OTP Verification Boxes, File Upload Dropzone, Bento Spotlight Card, Toggle Switch, Animated Checkbox, Circular Progress Ring, Skeleton Loader, Tooltip, Badge Pulse, Rating Stars, Range Slider
 10. **Advanced**: Glassmorphism Frost, Text Reveal Mask, Marquee Scroller, Morphing Blob, Card Spotlight, Noise Grain Texture, Neon Cyber Button, Video/Image Text Mask
 
 ---

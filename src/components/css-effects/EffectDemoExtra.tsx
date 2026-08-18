@@ -23,29 +23,40 @@ export function EffectDemoExtra({ effectId }: EffectDemoProps) {
     // ==================== COMPONENTS ====================
     case 'toggle-switch':
       return (
-        <div className="flex items-center justify-center h-full">
+        <div className="flex items-center justify-center h-full w-full px-3">
           <div
-            className={`fx-toggle-switch ${toggleActive ? 'active' : ''}`}
+            className="fx-toggle-card"
             onClick={() => setToggleActive(!toggleActive)}
-          />
+          >
+            <div>
+              <div className="fx-toggle-title">Push Notifications</div>
+              <div className="fx-toggle-desc">Real-time system alerts</div>
+            </div>
+            <div className={`fx-toggle-switch ${toggleActive ? 'active' : ''}`} />
+          </div>
         </div>
       );
 
     case 'checkbox-anim':
       return (
-        <div className="flex items-center justify-center h-full">
-          <label className="fx-checkbox-anim">
-            <input
-              type="checkbox"
-              checked={checkboxChecked}
-              onChange={(e) => setCheckboxChecked(e.target.checked)}
-            />
-            <span className="fx-checkbox-box">
-              <svg viewBox="0 0 16 16">
-                <polyline points="3 8 7 12 13 4" />
-              </svg>
+        <div className="flex items-center justify-center h-full w-full px-3">
+          <label className="fx-checkbox-card">
+            <span className="fx-checkbox-anim">
+              <input
+                type="checkbox"
+                checked={checkboxChecked}
+                onChange={(e) => setCheckboxChecked(e.target.checked)}
+              />
+              <span className="fx-checkbox-box">
+                <svg viewBox="0 0 16 16">
+                  <polyline points="3 8 7 12 13 4" />
+                </svg>
+              </span>
+              <span className="fx-checkbox-label-text">
+                <span className="fx-checkbox-title">Hardware Acceleration</span>
+                <span className="fx-checkbox-desc">Boost rendering performance</span>
+              </span>
             </span>
-            Accept terms
           </label>
         </div>
       );
@@ -66,11 +77,11 @@ export function EffectDemoExtra({ effectId }: EffectDemoProps) {
     case 'skeleton':
       return (
         <div className="flex items-center justify-center h-full w-full px-4">
-          <div className="flex flex-col gap-3 w-full max-w-[240px]">
-            <div className="fx-skeleton" style={{ width: '60%', height: '20px' }} />
-            <div className="fx-skeleton" style={{ width: '100%', height: '14px' }} />
-            <div className="fx-skeleton" style={{ width: '80%', height: '14px' }} />
-            <div className="fx-skeleton" style={{ width: '40%', height: '32px', borderRadius: '6px', marginTop: '8px' }} />
+          <div className="fx-skeleton-card">
+            <div className="fx-skeleton" style={{ width: '55%', height: '16px' }} />
+            <div className="fx-skeleton" style={{ width: '100%', height: '11px' }} />
+            <div className="fx-skeleton" style={{ width: '85%', height: '11px' }} />
+            <div className="fx-skeleton" style={{ width: '40%', height: '26px', borderRadius: '6px', marginTop: '4px' }} />
           </div>
         </div>
       );
@@ -105,7 +116,7 @@ export function EffectDemoExtra({ effectId }: EffectDemoProps) {
             {stars.map((i) => (
               <span
                 key={i}
-                className={`fx-star ${i < filledStars ? 'filled' : ''}`}
+                className={`fx-star ${i < (hoveredStar !== -1 ? hoveredStar + 1 : filledStars) ? 'filled' : ''}`}
                 onMouseEnter={() => setHoveredStar(i)}
                 onMouseLeave={() => setHoveredStar(-1)}
                 onClick={() => setFilledStars(i + 1)}
@@ -127,6 +138,9 @@ export function EffectDemoExtra({ effectId }: EffectDemoProps) {
             min="0"
             max="100"
             defaultValue="70"
+            onInput={(e) => {
+              (e.currentTarget as HTMLInputElement).style.backgroundSize = `${(e.currentTarget as HTMLInputElement).value}% 100%`;
+            }}
           />
         </div>
       );
@@ -196,11 +210,10 @@ export function EffectDemoExtra({ effectId }: EffectDemoProps) {
     case 'noise-grain':
       return (
         <div className="flex items-center justify-center h-full">
-          <div className="fx-noise-grain" style={{ background: '#1e1e1e', padding: '32px', borderRadius: '12px', maxWidth: '280px' }}>
-            <h3 style={{ color: '#e5e5e5', fontSize: '18px', fontWeight: 700 }}>Cinematic Grain</h3>
-            <p style={{ color: '#999', fontSize: '14px', marginTop: '8px' }}>
-              A subtle noise texture overlay adds depth and a film-like quality.
-            </p>
+          <div className="fx-noise-grain" style={{ padding: '24px 20px', maxWidth: '250px' }}>
+            <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '1px', color: '#f59e0b', textTransform: 'uppercase', background: 'rgba(245,158,11,0.15)', padding: '3px 6px', borderRadius: '4px' }}>Film 35mm</span>
+            <h3 style={{ color: '#fff', fontSize: '14px', fontWeight: 700, marginTop: '8px' }}>Cinematic Grain</h3>
+            <p style={{ color: '#a1a1aa', fontSize: '11px', marginTop: '4px', lineHeight: 1.4 }}>Realtime animated fractal noise texture with analog warmth.</p>
           </div>
         </div>
       );
@@ -216,6 +229,125 @@ export function EffectDemoExtra({ effectId }: EffectDemoProps) {
       return (
         <div className="flex items-center justify-center h-full">
           <h2 className="fx-text-mask">Gradient Text</h2>
+        </div>
+      );
+
+    // ==================== NEW MODERN UI COMPONENTS ====================
+    case 'floating-input':
+      return (
+        <div className="flex items-center justify-center h-full w-full px-4">
+          <div className="fx-floating-input-group">
+            <input type="text" className="fx-floating-input" placeholder=" " defaultValue="developer@csshub.io" />
+            <label className="fx-floating-label">Email Address</label>
+          </div>
+        </div>
+      );
+
+    case 'sliding-tab-bar':
+      return (
+        <div className="flex items-center justify-center h-full w-full px-2">
+          <div className="fx-sliding-tabs">
+            <button className="fx-tab-item active" onClick={(e) => {
+              const p = (e.target as HTMLElement).parentElement;
+              p?.querySelectorAll('.fx-tab-item').forEach((el) => el.classList.remove('active'));
+              (e.target as HTMLElement).classList.add('active');
+            }}>Overview</button>
+            <button className="fx-tab-item" onClick={(e) => {
+              const p = (e.target as HTMLElement).parentElement;
+              p?.querySelectorAll('.fx-tab-item').forEach((el) => el.classList.remove('active'));
+              (e.target as HTMLElement).classList.add('active');
+            }}>Analytics</button>
+            <button className="fx-tab-item" onClick={(e) => {
+              const p = (e.target as HTMLElement).parentElement;
+              p?.querySelectorAll('.fx-tab-item').forEach((el) => el.classList.remove('active'));
+              (e.target as HTMLElement).classList.add('active');
+            }}>Settings</button>
+          </div>
+        </div>
+      );
+
+    case 'animated-accordion':
+      return (
+        <div className="flex items-center justify-center h-full w-full px-3">
+          <div className="fx-accordion-item open" onClick={(e) => (e.currentTarget as HTMLElement).classList.toggle('open')}>
+            <div className="fx-accordion-header">
+              <span>What is CSSHUB?</span>
+              <svg className="fx-accordion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
+            <div className="fx-accordion-content">
+              CSSHUB is an open-source library of pure CSS effects with an 8-direction live interactive studio.
+            </div>
+          </div>
+        </div>
+      );
+
+    case 'step-progress-bar':
+      return (
+        <div className="flex items-center justify-center h-full w-full px-4">
+          <div className="fx-step-tracker">
+            <div className="fx-step-node completed">✓</div>
+            <div className="fx-step-line filled" />
+            <div className="fx-step-node active">2</div>
+            <div className="fx-step-line" />
+            <div className="fx-step-node">3</div>
+          </div>
+        </div>
+      );
+
+    case 'floating-toast':
+      return (
+        <div className="flex items-center justify-center h-full w-full px-3">
+          <div className="fx-toast-card">
+            <div className="fx-toast-icon">✓</div>
+            <div>
+              <div className="fx-toast-title">Changes Saved</div>
+              <div className="fx-toast-desc">Your CSS effect was copied!</div>
+            </div>
+            <div className="fx-toast-progress" />
+          </div>
+        </div>
+      );
+
+    case 'otp-input-boxes':
+      return (
+        <div className="flex items-center justify-center h-full w-full px-2">
+          <div className="fx-otp-container">
+            <input className="fx-otp-box" maxLength={1} defaultValue="7" />
+            <input className="fx-otp-box" maxLength={1} defaultValue="2" />
+            <input className="fx-otp-box" maxLength={1} defaultValue="9" />
+            <input className="fx-otp-box" maxLength={1} placeholder="•" />
+          </div>
+        </div>
+      );
+
+    case 'file-dropzone':
+      return (
+        <div className="flex items-center justify-center h-full w-full px-3">
+          <div className="fx-dropzone-box">
+            <div className="fx-dropzone-icon">📁</div>
+            <div className="fx-dropzone-text">Drop files to upload</div>
+            <div className="fx-dropzone-sub">PNG, JPG, SVG up to 10MB</div>
+          </div>
+        </div>
+      );
+
+    case 'bento-spotlight-card':
+      return (
+        <div className="flex items-center justify-center h-full w-full px-3">
+          <div
+            className="fx-bento-card"
+            onMouseMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              e.currentTarget.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+              e.currentTarget.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+            }}
+          >
+            <div className="fx-bento-badge">Component</div>
+            <div className="fx-bento-title">Smart Analytics</div>
+            <div className="fx-bento-desc">Interactive bento spotlight container with reactive hover tracking.</div>
+          </div>
         </div>
       );
 
