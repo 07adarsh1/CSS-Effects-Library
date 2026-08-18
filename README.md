@@ -1,6 +1,6 @@
-# CSS-Effects-Library 🎨✨
+# CSSHUB 🎨✨
 
-A curated, interactive CSS & UI Effects Library and Playground with **64+ production-ready CSS effects** across 10 categories, built with Next.js 16, React 19, Tailwind CSS, and Framer Motion.
+A curated, interactive CSS & UI Effects Library and Live Studio with **64+ production-ready CSS effects** across 10 categories, built with Next.js 16, React 19, Tailwind CSS, and Framer Motion.
 
 ![CSS Effects Showcase Preview](public/screenshots/ss-new-hero.png)
 
@@ -8,14 +8,16 @@ A curated, interactive CSS & UI Effects Library and Playground with **64+ produc
 
 ## 🚀 Features
 
-- **⚡ Live Interactive Studio for Every Component**: Click any component or card to open a full-featured live interactive studio. Tweak colors, animation speeds, zoom scales, canvas themes, and edit CSS & HTML in real-time with instant hot preview!
+- **⚡ Live Interactive Studio for Every Component**: Click any component or card to open a full-featured 8-direction resizable live studio.
+- **🪟 8-Way Window Resizing & Dragging**: Grab any of the 4 borders or 4 corners to resize smoothly without lag. Drag the header to reposition anywhere.
+- **↔️ Draggable Split-Pane Divider**: Adjust canvas vs editor widths freely with instant reactive resizing.
+- **🎨 Real-Time CSS & HTML Customization**: Tweak accent colors, speeds, zoom scales, canvas backgrounds, and live edit code with instant hot preview.
+- **⌨️ Keyboard Navigation**: Press `←` and `→` in the Live Studio to effortlessly browse and test all 64 effects in interactive mode.
 - **64+ Curated CSS Effects**: Hover effects, loading spinners, glowing borders, glassmorphism, 3D cards, text animations, UI components, and advanced effects.
-- **Interactive CSS Playground**: Preset-enabled live sandbox with dual HTML & CSS editors and split live rendering.
-- **Keyboard Navigation**: Press `←` and `→` in the Live Studio to effortlessly browse and test all 64 effects in interactive mode.
-- **Favorites System**: Save and filter your favorite effects using persistent local storage.
-- **Export All CSS**: Download or copy all 64 CSS effect rules directly for your own projects.
-- **Dark & Light Mode**: Built-in sleek dark theme and crisp light theme.
-- **Search & Multi-Category Filter**: Instant search by effect name or category tag.
+- **♥ Favorites System**: Save and filter your favorite effects using persistent local storage.
+- **📦 Export All CSS**: Download or copy all 64 CSS effect rules directly for your own projects.
+- **🌙 Dark & Light Mode**: Built-in sleek dark theme and crisp light theme.
+- **🔍 Search & Multi-Category Filter**: Instant search by effect name or category tag.
 
 ---
 

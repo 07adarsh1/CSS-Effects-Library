@@ -1,6 +1,6 @@
 'use client';
 
-import { Shuffle, Code, Download } from 'lucide-react';
+import { Shuffle, Download, Zap } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 
@@ -8,32 +8,30 @@ interface FeatureBarProps {
   effectCount: number;
   onRandomEffect: () => void;
   onExportCSS: () => void;
-  onTogglePlayground: () => void;
-  showPlayground: boolean;
+  onOpenStudio: () => void;
 }
 
 export function FeatureBar({
   effectCount,
   onRandomEffect,
   onExportCSS,
-  onTogglePlayground,
-  showPlayground,
+  onOpenStudio,
 }: FeatureBarProps) {
   return (
-    <div className="flex items-center gap-2 rounded-lg border border-border/50 bg-card px-3 py-2">
+    <div className="flex items-center gap-1.5 rounded-xl border border-border/50 bg-card p-1">
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
             variant="ghost"
             size="sm"
             onClick={onRandomEffect}
-            className="h-8 gap-1.5 text-muted-foreground hover:text-foreground"
+            className="h-8 gap-1.5 text-muted-foreground hover:text-foreground px-2.5"
           >
-            <Shuffle className="w-4 h-4" />
-            <span className="hidden sm:inline text-xs">Random Effect</span>
+            <Shuffle className="w-4 h-4 text-amber-500" />
+            <span className="hidden sm:inline text-xs font-medium">Random</span>
           </Button>
         </TooltipTrigger>
-        <TooltipContent>Jump to a random effect</TooltipContent>
+        <TooltipContent>Open a random effect in Studio</TooltipContent>
       </Tooltip>
 
       <Tooltip>
@@ -41,14 +39,14 @@ export function FeatureBar({
           <Button
             variant="ghost"
             size="sm"
-            onClick={onTogglePlayground}
-            className={`h-8 gap-1.5 ${showPlayground ? 'text-amber-500 hover:text-amber-400 bg-amber-500/10' : 'text-muted-foreground hover:text-foreground'}`}
+            onClick={onOpenStudio}
+            className="h-8 gap-1.5 text-amber-500 hover:text-amber-400 bg-amber-500/10 hover:bg-amber-500/15 px-2.5 font-semibold"
           >
-            <Code className="w-4 h-4" />
-            <span className="hidden sm:inline text-xs">CSS Playground</span>
+            <Zap className="w-3.5 h-3.5 fill-amber-500" />
+            <span className="hidden sm:inline text-xs">Live Studio</span>
           </Button>
         </TooltipTrigger>
-        <TooltipContent>Toggle live CSS playground</TooltipContent>
+        <TooltipContent>Open interactive Live Studio</TooltipContent>
       </Tooltip>
 
       <Tooltip>
@@ -57,13 +55,13 @@ export function FeatureBar({
             variant="ghost"
             size="sm"
             onClick={onExportCSS}
-            className="h-8 gap-1.5 text-muted-foreground hover:text-foreground"
+            className="h-8 gap-1.5 text-muted-foreground hover:text-foreground px-2.5"
           >
             <Download className="w-4 h-4" />
-            <span className="hidden sm:inline text-xs">Export All CSS</span>
+            <span className="hidden sm:inline text-xs font-medium">Export</span>
           </Button>
         </TooltipTrigger>
-        <TooltipContent>Download all {effectCount} CSS effects</TooltipContent>
+        <TooltipContent>Download all {effectCount} CSS rules</TooltipContent>
       </Tooltip>
     </div>
   );

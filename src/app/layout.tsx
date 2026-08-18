@@ -17,9 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CSS Effects Lab — 64 Curated CSS Effects with Live Demos",
+  title: "CSSHUB — 64+ Curated CSS Effects with Live Studio",
   description:
-    "A comprehensive collection of 64 beautiful, production-ready CSS effects across 10 categories with favorites, live playground, and export. Browse, preview, and copy code instantly.",
+    "CSSHUB: A modern library of 64+ beautiful, production-ready CSS effects with 8-way resizable Live Studio, real-time code editing, and 1-click export. Browse, customize, and copy code instantly.",
   keywords: [
     "CSS effects",
     "CSS animations",
