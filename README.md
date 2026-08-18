@@ -2,38 +2,44 @@
 
 A curated, interactive CSS & UI Effects Library and Live Studio with **64+ production-ready CSS effects** across 10 categories, built with Next.js 16, React 19, Tailwind CSS, and Framer Motion.
 
-![CSS Effects Showcase Preview](public/screenshots/ss-new-hero.png)
+![CSSHUB Showcase Preview](public/screenshots/csshub-hero.png)
 
 ---
 
-## 🚀 Features
+## 🚀 Key Features
 
-- **⚡ Live Interactive Studio for Every Component**: Click any component or card to open a full-featured 8-direction resizable live studio.
-- **🪟 8-Way Window Resizing & Dragging**: Grab any of the 4 borders or 4 corners to resize smoothly without lag. Drag the header to reposition anywhere.
+- **⚡ 8-Way Resizable Desktop Live Studio**: Click any component to open a desktop-grade sandbox that can be resized from all 4 borders and 4 corners, dragged by its header, or maximized to fullscreen without lag.
 - **↔️ Draggable Split-Pane Divider**: Adjust canvas vs editor widths freely with instant reactive resizing.
-- **🎨 Real-Time CSS & HTML Customization**: Tweak accent colors, speeds, zoom scales, canvas backgrounds, and live edit code with instant hot preview.
+- **🎨 Real-Time CSS & HTML Live Editors**: Edit CSS stylesheet rules and HTML element markup in real-time with instant hot preview.
+- **🌈 Canvas Customizer & Environment Themes**: Preview components in Dark, Pitch Black, Light, Grid, Dotted Matrix, or Gradient themes.
+- **⚡ Accent Tint & Speed Controls**: Dynamically change accent color palettes, adjust animation speeds (0.5x, 1x, 2x), and zoom scales (0.75x to 1.5x).
+- **🔒 Simulate Hover Lock**: Lock and inspect hover animations continuously without keeping your mouse on the element.
+- **🏹 Infused Category Navigation Bar**: Smooth scrolling category pills with integrated `<` and `>` arrow buttons and subtle gradient edge fades.
 - **⌨️ Keyboard Navigation**: Press `←` and `→` in the Live Studio to effortlessly browse and test all 64 effects in interactive mode.
 - **64+ Curated CSS Effects**: Hover effects, loading spinners, glowing borders, glassmorphism, 3D cards, text animations, UI components, and advanced effects.
 - **♥ Favorites System**: Save and filter your favorite effects using persistent local storage.
-- **📦 Export All CSS**: Download or copy all 64 CSS effect rules directly for your own projects.
+- **📦 1-Click Copy & Export**: Instant 1-click copy for pure CSS and HTML, or download all 64 CSS effect rules directly for your projects.
 - **🌙 Dark & Light Mode**: Built-in sleek dark theme and crisp light theme.
-- **🔍 Search & Multi-Category Filter**: Instant search by effect name or category tag.
 
 ---
 
-## 📸 Screenshots
+## 📸 Screenshots & Previews
 
-| Hero & Showcase | Live CSS Playground |
+| CSSHUB Hero & Ambient Showcase | 8-Way Resizable Live Studio |
 | :---: | :---: |
-| ![Showcase](public/screenshots/ss-new-hero.png) | ![Playground](public/screenshots/ss-playground.png) |
+| ![Hero Showcase](public/screenshots/csshub-hero.png) | ![Live Studio](public/screenshots/csshub-studio-overview.png) |
 
-| Code Modal & Syntax Highlighting | Dark Theme Showcase |
+| Realtime Live CSS Editor | Realtime Live HTML Editor |
 | :---: | :---: |
-| ![Code Modal](public/screenshots/ss-code-modal.png) | ![Dark Mode](public/screenshots/screenshot-dark.png) |
+| ![Live CSS Editor](public/screenshots/csshub-live-css.png) | ![Live HTML Editor](public/screenshots/csshub-live-html.png) |
+
+| Multi-Axis Resized Window | Light Theme Mode |
+| :---: | :---: |
+| ![Resized Live Studio](public/screenshots/csshub-studio-resized.png) | ![Light Theme](public/screenshots/screenshot-light.png) |
 
 ---
 
-## 🗂️ Effect Categories
+## 🗂️ Effect Categories (64+ Effects)
 
 1. **Hover Effects**: Glow, Underline Reveal, Lift, Border Expand, Shine Sweep, Tilt, 3D Flip, Neon Pulse
 2. **Loading Spinners**: Dual Ring, Ripple Pulse, Dot Bounce, Orbit, Gradient Spinner, Bar Wave, Infinity Loop, Hourglass
@@ -51,7 +57,8 @@ A curated, interactive CSS & UI Effects Library and Live Studio with **64+ produ
 ## 🛠️ Tech Stack
 
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
-- **UI & Components**: [React 19](https://react.dev/), [Tailwind CSS v4](https://tailwindcss.com/), [Radix UI](https://radix-ui.com/), [Lucide Icons](https://lucide.dev/)
+- **UI & Styling**: [React 19](https://react.dev/), [Tailwind CSS v4](https://tailwindcss.com/), [Radix UI](https://radix-ui.com/), [Lucide Icons](https://lucide.dev/)
+- **Split Panels**: [react-resizable-panels](https://github.com/bvaughn/react-resizable-panels)
 - **Animations**: Framer Motion & Pure CSS3
 - **State Management**: [Zustand](https://zustand-demo.pmnd.rs/) (with LocalStorage persist)
 - **Code Highlighting**: [React Syntax Highlighter](https://github.com/react-syntax-highlighter/react-syntax-highlighter)
@@ -69,46 +76,47 @@ cd CSS-Effects-Library
 ### 2. Install dependencies
 ```bash
 npm install
-# or
-bun install
 ```
 
 ### 3. Run the development server
 ```bash
 npm run dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to view the library.
+Open [http://localhost:3005](http://localhost:3005) in your browser to view CSSHUB.
+
+### 4. Build for Production
+```bash
+npm run build
+```
 
 ---
 
 ## 📁 Project Structure
 
 ```
+d:\CSSHUB/
 ├── public/
-│   ├── logo.svg
-│   ├── robots.txt
-│   └── screenshots/        # Feature & demo screenshots
+│   ├── next.svg
+│   ├── vercel.svg
+│   └── screenshots/              # Screenshots and visual previews
 ├── src/
-│   ├── app/
-│   │   ├── globals.css     # Theme & base styles
-│   │   ├── layout.tsx      # Root layout & font definitions
-│   │   └── page.tsx        # Main application page
+│   ├── app/                      # Next.js App Router (layout.tsx, page.tsx, globals.css)
 │   ├── components/
-│   │   ├── css-effects/    # Effect cards, showcase, modals & playground
-│   │   └── ui/             # Radix UI primitives & design components
-│   ├── hooks/              # Custom React hooks (toast, mobile)
-│   ├── lib/
-│   │   ├── effects-data.ts # Metadata and code for effects (1-48)
-│   │   ├── effects-extra-data.ts # Metadata and code for effects (49-64)
-│   │   ├── store.ts        # Zustand favorites store
-│   │   └── utils.ts        # Utility functions (cn helper)
-│   └── styles/
-│       ├── effects.css     # CSS rules for effects 1-48
-│       └── effects-extra.css # CSS rules for effects 49-64
+│   │   ├── css-effects/          # CSSHUB components (EffectsShowcase, LiveStudioModal, EffectCard, etc.)
+│   │   └── ui/                   # Radix UI primitives (button, resizable, dialog, tabs, tooltip, etc.)
+│   ├── hooks/                    # Custom React hooks (use-mobile, use-toast)
+│   ├── lib/                      # Data & state (effects-data, effects-extra-data, store, utils)
+│   └── styles/                   # CSS rules (effects.css, effects-extra.css)
+├── .gitignore
+├── AGENTS.md
+├── components.json
+├── eslint.config.mjs
+├── next.config.ts
 ├── package.json
+├── package-lock.json
+├── postcss.config.mjs
+├── README.md
 ├── tailwind.config.ts
 └── tsconfig.json
 ```
