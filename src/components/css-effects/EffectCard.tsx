@@ -184,6 +184,20 @@ export function EffectCard({ effect, index, onOpenStudio }: EffectCardProps) {
                 <code>{effect.htmlCode}</code>
               </pre>
             </div>
+
+            {/* Bottom Quick Launch Actions */}
+            <div className="p-2.5 bg-[#09090d] border-t border-border/40 flex items-center justify-end gap-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenStudio(effect);
+                }}
+                className="flex items-center gap-1 text-[11px] font-semibold text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/20 px-3 py-1 rounded-md transition-all"
+              >
+                <Zap className="w-3 h-3" />
+                <span>Open Live Studio →</span>
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

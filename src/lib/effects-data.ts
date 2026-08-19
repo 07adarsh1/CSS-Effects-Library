@@ -663,7 +663,10 @@ function createRipple(e) {
   background: linear-gradient(-45deg, #f59e0b, #ef4444, #ec4899, #8b5cf6);
   background-size: 400% 400%;
   animation: bg-grad-move 8s ease infinite;
-  border-radius: 8px;
+  border-radius: 12px;
+  width: 100%;
+  height: 240px;
+  min-height: 200px;
 }
 
 @keyframes bg-grad-move {
@@ -671,7 +674,7 @@ function createRipple(e) {
   50%  { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }`,
-    htmlCode: `<div class="animated-gradient" style="width: 100%; height: 200px;"></div>`,
+    htmlCode: `<div class="animated-gradient" style="width: 100%; height: 240px;"></div>`,
   },
   {
     id: 'bg-dot-matrix',
@@ -680,17 +683,20 @@ function createRipple(e) {
     description: 'A pulsating grid of dots that breathe in and out, creating a subtle living texture.',
     cssCode: `.dot-matrix {
   background-color: #0a0a0a;
-  background-image: radial-gradient(circle, rgba(245, 158, 11, 0.2) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(245, 158, 11, 0.28) 1.5px, transparent 1.5px);
   background-size: 16px 16px;
-  border-radius: 8px;
+  border-radius: 12px;
   animation: dot-pulse 3s ease-in-out infinite;
+  width: 100%;
+  height: 240px;
+  min-height: 200px;
 }
 
 @keyframes dot-pulse {
   0%, 100% { background-size: 16px 16px; }
-  50%      { background-size: 20px 20px; }
+  50%      { background-size: 22px 22px; }
 }`,
-    htmlCode: `<div class="dot-matrix" style="width: 100%; height: 200px;"></div>`,
+    htmlCode: `<div class="dot-matrix" style="width: 100%; height: 240px;"></div>`,
   },
   {
     id: 'bg-stripes',
@@ -700,21 +706,25 @@ function createRipple(e) {
     cssCode: `.bg-stripes {
   background: repeating-linear-gradient(
     45deg,
-    rgba(245, 158, 11, 0.13),
-    rgba(245, 158, 11, 0.13) 10px,
-    rgba(245, 158, 11, 0.07) 10px,
-    rgba(245, 158, 11, 0.07) 20px
+    rgba(245, 158, 11, 0.2),
+    rgba(245, 158, 11, 0.2) 12px,
+    rgba(245, 158, 11, 0.08) 12px,
+    rgba(245, 158, 11, 0.08) 24px
   );
   background-size: 200% 200%;
   animation: stripe-move 4s linear infinite;
-  border-radius: 8px;
+  border-radius: 12px;
+  background-color: #0a0a0a;
+  width: 100%;
+  height: 240px;
+  min-height: 200px;
 }
 
 @keyframes stripe-move {
   0%   { background-position: 0 0; }
-  100% { background-position: 28px 28px; }
+  100% { background-position: 34px 34px; }
 }`,
-    htmlCode: `<div class="bg-stripes" style="width: 100%; height: 200px;"></div>`,
+    htmlCode: `<div class="bg-stripes" style="width: 100%; height: 240px;"></div>`,
   },
   {
     id: 'bg-aurora',
@@ -722,8 +732,10 @@ function createRipple(e) {
     category: 'background',
     description: 'Northern lights inspired effect with blurred color orbs floating and blending.',
     cssCode: `.aurora-bg {
-  width: 100%; height: 100%;
-  border-radius: 8px;
+  width: 100%;
+  height: 240px;
+  min-height: 200px;
+  border-radius: 12px;
   position: relative;
   overflow: hidden;
   background: #0a0a0a;
@@ -733,30 +745,33 @@ function createRipple(e) {
 .aurora-bg::after {
   content: '';
   position: absolute;
-  width: 200%; height: 200%;
+  width: 200%;
+  height: 200%;
   border-radius: 50%;
   filter: blur(60px);
-  opacity: 0.5;
+  opacity: 0.55;
   animation: aurora-move 6s ease-in-out infinite alternate;
 }
 
 .aurora-bg::before {
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.33), transparent 70%);
-  top: -80%; left: -60%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.4), transparent 70%);
+  top: -80%;
+  left: -60%;
 }
 
 .aurora-bg::after {
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.33), transparent 70%);
-  bottom: -80%; right: -60%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.4), transparent 70%);
+  bottom: -80%;
+  right: -60%;
   animation-delay: -3s;
   animation-direction: alternate-reverse;
 }
 
 @keyframes aurora-move {
   0%   { transform: translate(0, 0) rotate(0deg); }
-  100% { transform: translate(30%, 30%) rotate(15deg); }
+  100% { transform: translate(25%, 25%) rotate(15deg); }
 }`,
-    htmlCode: `<div class="aurora-bg" style="width: 100%; height: 200px;"></div>`,
+    htmlCode: `<div class="aurora-bg" style="width: 100%; height: 240px;"></div>`,
   },
   {
     id: 'bg-geometric',
@@ -764,8 +779,10 @@ function createRipple(e) {
     category: 'background',
     description: 'Rotating triangular geometric pattern using repeating linear gradients.',
     cssCode: `.geometric-bg {
-  width: 100%; height: 100%;
-  border-radius: 8px;
+  width: 100%;
+  height: 240px;
+  min-height: 200px;
+  border-radius: 12px;
   background: #0a0a0a;
   position: relative;
   overflow: hidden;
@@ -776,10 +793,10 @@ function createRipple(e) {
   position: absolute;
   inset: -50%;
   background:
-    linear-gradient(30deg, rgba(245,158,11,0.07) 12%, transparent 12.5%, transparent 87%, rgba(245,158,11,0.07) 87.5%),
-    linear-gradient(150deg, rgba(245,158,11,0.07) 12%, transparent 12.5%, transparent 87%, rgba(245,158,11,0.07) 87.5%),
-    linear-gradient(30deg, rgba(245,158,11,0.07) 12%, transparent 12.5%, transparent 87%, rgba(245,158,11,0.07) 87.5%),
-    linear-gradient(150deg, rgba(245,158,11,0.07) 12%, transparent 12.5%, transparent 87%, rgba(245,158,11,0.07) 87.5%);
+    linear-gradient(30deg, rgba(245,158,11,0.1) 12%, transparent 12.5%, transparent 87%, rgba(245,158,11,0.1) 87.5%),
+    linear-gradient(150deg, rgba(245,158,11,0.1) 12%, transparent 12.5%, transparent 87%, rgba(245,158,11,0.1) 87.5%),
+    linear-gradient(30deg, rgba(245,158,11,0.1) 12%, transparent 12.5%, transparent 87%, rgba(245,158,11,0.1) 87.5%),
+    linear-gradient(150deg, rgba(245,158,11,0.1) 12%, transparent 12.5%, transparent 87%, rgba(245,158,11,0.1) 87.5%);
   background-size: 40px 70px;
   background-position: 0 0, 0 0, 20px 35px, 20px 35px;
   animation: geo-move 8s linear infinite;
@@ -789,7 +806,7 @@ function createRipple(e) {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }`,
-    htmlCode: `<div class="geometric-bg" style="width: 100%; height: 200px;"></div>`,
+    htmlCode: `<div class="geometric-bg" style="width: 100%; height: 240px;"></div>`,
   },
   {
     id: 'bg-waves',
@@ -797,8 +814,10 @@ function createRipple(e) {
     category: 'background',
     description: 'Layered elliptical shapes rotating in opposite directions, mimicking ocean waves.',
     cssCode: `.waves-bg {
-  width: 100%; height: 100%;
-  border-radius: 8px;
+  width: 100%;
+  height: 240px;
+  min-height: 200px;
+  border-radius: 12px;
   background: linear-gradient(180deg, #0a0a0a, #1a0f00);
   position: relative;
   overflow: hidden;
@@ -807,9 +826,11 @@ function createRipple(e) {
 .waves-bg::before {
   content: '';
   position: absolute;
-  bottom: 0; left: -50%;
-  width: 200%; height: 50%;
-  background: radial-gradient(ellipse at center, rgba(245,158,11,0.13), transparent 70%);
+  bottom: 0;
+  left: -50%;
+  width: 200%;
+  height: 55%;
+  background: radial-gradient(ellipse at center, rgba(245,158,11,0.2), transparent 70%);
   border-radius: 40%;
   animation: wave-rotate 6s linear infinite;
 }
@@ -817,9 +838,11 @@ function createRipple(e) {
 .waves-bg::after {
   content: '';
   position: absolute;
-  bottom: 0; left: -50%;
-  width: 200%; height: 45%;
-  background: radial-gradient(ellipse at center, rgba(239,68,68,0.13), transparent 70%);
+  bottom: 0;
+  left: -50%;
+  width: 200%;
+  height: 50%;
+  background: radial-gradient(ellipse at center, rgba(239,68,68,0.2), transparent 70%);
   border-radius: 42%;
   animation: wave-rotate 8s linear infinite reverse;
 }
@@ -828,7 +851,7 @@ function createRipple(e) {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }`,
-    htmlCode: `<div class="waves-bg" style="width: 100%; height: 200px;"></div>`,
+    htmlCode: `<div class="waves-bg" style="width: 100%; height: 240px;"></div>`,
   },
 
   // ==================== 3D EFFECTS ====================

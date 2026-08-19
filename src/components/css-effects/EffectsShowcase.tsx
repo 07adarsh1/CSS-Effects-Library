@@ -41,9 +41,11 @@ export function EffectsShowcase() {
   const [studioEffect, setStudioEffect] = useState<CSSEffect | null>(null);
   const categoryScrollRef = useRef<HTMLDivElement>(null);
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const favorites = useEffectsStore((s) => s.favorites);
 
   useEffect(() => {
+    setMounted(true);
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -178,7 +180,11 @@ export function EffectsShowcase() {
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                 aria-label="Toggle dark/light mode"
               >
-                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                {mounted ? (
+                  theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />
+                ) : (
+                  <span className="w-4 h-4 block" />
+                )}
               </Button>
             </div>
           </div>

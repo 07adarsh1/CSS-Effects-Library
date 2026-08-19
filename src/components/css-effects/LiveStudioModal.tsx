@@ -21,11 +21,18 @@ import {
   Layers,
   Columns,
   Rows,
+  Package,
 } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { CSSEffect, allEffects } from '@/lib/effects-data';
 import { useEffectsStore } from '@/lib/store';
+import {
+  generateReactCode,
+  generateVueCode,
+  generateSvelteCode,
+  generateStandaloneHtml,
+} from '@/lib/export-generators';
 import { toast } from 'sonner';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -63,7 +70,8 @@ interface LiveStudioContentProps {
 }
 
 function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioContentProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'css-editor' | 'html-editor' | 'syntax'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'frameworks' | 'css-editor' | 'html-editor' | 'syntax'>('overview');
+  const [selectedFramework, setSelectedFramework] = useState<'react' | 'vue' | 'svelte' | 'html'>('react');
   const [bgTheme, setBgTheme] = useState<BackgroundTheme>('dark');
   const [scale, setScale] = useState<number>(1);
   const [speedMultiplier, setSpeedMultiplier] = useState<number>(1);
@@ -72,9 +80,55 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
   const [customHtml, setCustomHtml] = useState<string>(effect.htmlCode);
   const [isCustomModified, setIsCustomModified] = useState<boolean>(false);
   const [isHoverSimulated, setIsHoverSimulated] = useState<boolean>(false);
-  const [copiedType, setCopiedType] = useState<'css' | 'html' | 'react' | null>(null);
+  const [copiedType, setCopiedType] = useState<'css' | 'html' | 'react' | 'vue' | 'svelte' | 'standalone' | null>(null);
   const [splitDirection, setSplitDirection] = useState<'horizontal' | 'vertical'>('horizontal');
   const [renderKey, setRenderKey] = useState<number>(0);
+
+  const effectiveCss = useMemo(() => {
+    let code = isCustomModified ? customCss : effect.cssCode;
+    if (selectedColor !== '#f59e0b') {
+      const rgb = PRESET_COLORS.find((c) => c.hex === selectedColor)?.rgb || '245, 158, 11';
+      code = code
+        .replace(/#f59e0b/gi, selectedColor)
+        .replace(/rgba\(245,\s*158,\s*11,/gi, `rgba(${rgb},`);
+    }
+    return code;
+  }, [customCss, effect.cssCode, isCustomModified, selectedColor]);
+
+  const effectiveHtml = useMemo(() => {
+    return isCustomModified ? customHtml : effect.htmlCode;
+  }, [customHtml, effect.htmlCode, isCustomModified]);
+
+  const reactCode = useMemo(
+    () => generateReactCode(effect.id, effect.name, effectiveCss, effectiveHtml),
+    [effect.id, effect.name, effectiveCss, effectiveHtml]
+  );
+  const vueCode = useMemo(
+    () => generateVueCode(effect.name, effectiveCss, effectiveHtml),
+    [effect.name, effectiveCss, effectiveHtml]
+  );
+  const svelteCode = useMemo(
+    () => generateSvelteCode(effect.name, effectiveCss, effectiveHtml),
+    [effect.name, effectiveCss, effectiveHtml]
+  );
+  const standaloneHtmlCode = useMemo(
+    () => generateStandaloneHtml(effect.name, effectiveCss, effectiveHtml),
+    [effect.name, effectiveCss, effectiveHtml]
+  );
+
+  const currentFrameworkCode = useMemo(() => {
+    switch (selectedFramework) {
+      case 'react':
+        return reactCode;
+      case 'vue':
+        return vueCode;
+      case 'svelte':
+        return svelteCode;
+      case 'html':
+      default:
+        return standaloneHtmlCode;
+    }
+  }, [selectedFramework, reactCode, vueCode, svelteCode, standaloneHtmlCode]);
 
   // 8-Direction Window Resizing & Dragging State
   const [isMaximized, setIsMaximized] = useState<boolean>(false);
@@ -262,11 +316,12 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
     }
   };
 
-  const copyToClipboard = async (text: string, type: 'css' | 'html' | 'react') => {
+  const copyToClipboard = async (text: string, type: 'css' | 'html' | 'react' | 'vue' | 'svelte' | 'standalone') => {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedType(type);
-      toast.success(`${type.toUpperCase()} copied to clipboard!`);
+      const label = type === 'standalone' ? 'HTML + CSS' : type.toUpperCase();
+      toast.success(`${label} copied to clipboard!`);
       setTimeout(() => setCopiedType(null), 2000);
     } catch {
       toast.error('Failed to copy code');
@@ -425,6 +480,127 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
       setTimeout(() => circle.remove(), 600);
       return;
     }
+
+    // 9. Segmented Control Switcher
+    const segBtn = target.closest('.segmented-btn, .fx-segmented-btn');
+    if (segBtn) {
+      const parent = segBtn.parentElement;
+      if (parent) {
+        parent.querySelectorAll('.segmented-btn, .fx-segmented-btn').forEach((b) => b.classList.remove('active'));
+        segBtn.classList.add('active');
+      }
+      return;
+    }
+
+    // 10. Audio Waveform Player Play/Pause
+    const audioBtn = target.closest('.audio-play-btn, .fx-audio-play-btn');
+    if (audioBtn) {
+      const isPlaying = audioBtn.textContent?.includes('❚❚');
+      audioBtn.textContent = isPlaying ? '▶' : '❚❚';
+      const player = audioBtn.closest('.audio-player, .fx-audio-player');
+      if (player) {
+        const bars = player.querySelectorAll('.waveform-bar, .fx-waveform-bar');
+        bars.forEach((b) => {
+          (b as HTMLElement).style.animationPlayState = isPlaying ? 'paused' : 'running';
+        });
+      }
+      return;
+    }
+
+    // 11. Cookie Banner Actions
+    const cookieAccept = target.closest('.cookie-btn-accept, .fx-cookie-btn-accept');
+    if (cookieAccept) {
+      const banner = cookieAccept.closest('.cookie-banner, .fx-cookie-banner');
+      if (banner) {
+        const textEl = banner.querySelector('.cookie-text, .fx-cookie-text');
+        if (textEl) textEl.textContent = 'Preferences saved successfully!';
+        cookieAccept.textContent = '✓ Saved';
+      }
+      return;
+    }
+
+    // 12. Dynamic Island Capsule Toggle
+    const dynamicIsland = target.closest('.dynamic-island, .fx-dynamic-island');
+    if (dynamicIsland) {
+      dynamicIsland.classList.toggle('expanded');
+      return;
+    }
+
+    // 13. Music Player Toggle
+    const vinylBtn = target.closest('.music-player-card button, .fx-music-player-card button');
+    if (vinylBtn) {
+      const isPlay = vinylBtn.textContent === '▶';
+      vinylBtn.textContent = isPlay ? '❚❚' : '▶';
+      const disk = vinylBtn.closest('.music-player-card, .fx-music-player-card')?.querySelector('.vinyl-disk, .fx-vinyl-disk') as HTMLElement;
+      if (disk) {
+        disk.style.animationPlayState = isPlay ? 'running' : 'paused';
+      }
+      return;
+    }
+
+    // 14. Command Palette items
+    const cmdItem = target.closest('.cmd-item, .fx-cmd-item');
+    if (cmdItem) {
+      cmdItem.parentElement?.querySelectorAll('.cmd-item, .fx-cmd-item').forEach((b) => b.classList.remove('active'));
+      cmdItem.classList.add('active');
+      return;
+    }
+
+    // 15. File Tree nodes
+    const treeNode = target.closest('.tree-node, .fx-tree-node');
+    if (treeNode) {
+      treeNode.closest('.file-tree-wrap, .fx-file-tree-wrap')?.querySelectorAll('.tree-node, .fx-tree-node').forEach((n) => n.classList.remove('active'));
+      treeNode.classList.add('active');
+      return;
+    }
+
+    // 16. Multi-step Wizard
+    const wizardStep = target.closest('.wizard-step, .fx-wizard-step');
+    if (wizardStep) {
+      const bar = wizardStep.closest('.wizard-bar, .fx-wizard-bar');
+      if (bar) {
+        const steps = Array.from(bar.querySelectorAll('.wizard-step, .fx-wizard-step'));
+        const lines = Array.from(bar.querySelectorAll('.wizard-line, .fx-wizard-line'));
+        const clickedIdx = steps.indexOf(wizardStep);
+        if (clickedIdx !== -1) {
+          steps.forEach((s, i) => {
+            const circle = s.querySelector('.wizard-circle, .fx-wizard-circle');
+            if (i < clickedIdx) {
+              s.className = 'wizard-step fx-wizard-step done';
+              if (circle) circle.textContent = '✓';
+            } else if (i === clickedIdx) {
+              s.className = 'wizard-step fx-wizard-step active';
+              if (circle) circle.textContent = `${i + 1}`;
+            } else {
+              s.className = 'wizard-step fx-wizard-step';
+              if (circle) circle.textContent = `${i + 1}`;
+            }
+          });
+          lines.forEach((l, i) => {
+            l.className = i < clickedIdx ? 'wizard-line fx-wizard-line done' : 'wizard-line fx-wizard-line';
+          });
+        }
+      }
+      return;
+    }
+
+    // 17. Color Swatch Selector
+    const swatchDot = target.closest('.swatch-dot, .fx-swatch-dot');
+    if (swatchDot) {
+      swatchDot.parentElement?.querySelectorAll('.swatch-dot, .fx-swatch-dot').forEach((d) => d.classList.remove('selected'));
+      swatchDot.classList.add('selected');
+      return;
+    }
+
+    // 18. 3D Room Cube Flip
+    const cubeFlip = target.closest('.cube-flip-wrap, .fx-cube-flip-wrap');
+    if (cubeFlip) {
+      const inner = cubeFlip.querySelector('.cube-flip-inner, .fx-cube-flip-inner') as HTMLElement;
+      if (inner) {
+        inner.style.transform = inner.style.transform === 'rotateY(180deg)' ? 'rotateY(0deg)' : 'rotateY(180deg)';
+      }
+      return;
+    }
   };
 
   // Interactive mouse move tracking (spotlights & 3D tilt)
@@ -444,8 +620,13 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
     const target = e.target as HTMLInputElement;
 
     // Range slider dynamic track update
-    if (target.type === 'range' || target.classList?.contains('range-slider') || target.classList?.contains('fx-range-slider')) {
+    if (target.type === 'range' || target.classList?.contains('range-slider') || target.classList?.contains('fx-range-slider') || target.classList?.contains('custom-range') || target.classList?.contains('fx-custom-range')) {
       target.style.backgroundSize = `${target.value}% 100%`;
+      const priceCard = target.closest('.pricing-slider-card, .fx-pricing-slider-card');
+      if (priceCard) {
+        const amount = priceCard.querySelector('.price-amount, .fx-price-amount');
+        if (amount) amount.textContent = `$${target.value}`;
+      }
     }
 
     // OTP box auto advance
@@ -491,15 +672,12 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
     return `
       #live-studio-canvas-root {
         --live-accent: ${selectedColor};
-        --live-speed: ${speedMultiplier};
         box-sizing: border-box;
       }
       #live-studio-canvas-root *,
       #live-studio-canvas-root *::before,
       #live-studio-canvas-root *::after {
         box-sizing: border-box;
-        animation-duration: calc(var(--base-duration, 1s) / ${speedMultiplier});
-        transition-duration: calc(var(--base-transition, 0.35s) / ${speedMultiplier});
       }
       #live-studio-canvas-root input,
       #live-studio-canvas-root textarea,
@@ -507,15 +685,51 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
       #live-studio-canvas-root button {
         font-family: inherit;
       }
+      .live-interactive-sandbox-render {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
       .live-interactive-sandbox-render > * {
         flex-shrink: 0;
+      }
+      /* Full-surface styling for background category effects in studio */
+      .live-interactive-sandbox-render > .animated-gradient,
+      .live-interactive-sandbox-render > .dot-matrix,
+      .live-interactive-sandbox-render > .bg-stripes,
+      .live-interactive-sandbox-render > .aurora-bg,
+      .live-interactive-sandbox-render > .geometric-bg,
+      .live-interactive-sandbox-render > .geometric-pattern,
+      .live-interactive-sandbox-render > .waves-bg,
+      .live-interactive-sandbox-render > .matrix-bg,
+      .live-interactive-sandbox-render > .space-warp-bg,
+      .live-interactive-sandbox-render > .conic-vortex,
+      .live-interactive-sandbox-render > .synthwave-bg,
+      .live-interactive-sandbox-render > .quantum-bg,
+      .live-interactive-sandbox-render > .crt-screen,
+      .live-interactive-sandbox-render > .hex-mesh-bg,
+      .live-interactive-sandbox-render > .lava-bg,
+      .live-interactive-sandbox-render > .nebula-bg,
+      .live-interactive-sandbox-render > [class*="bg-"],
+      .live-interactive-sandbox-render > [class*="-bg"] {
+        width: 100% !important;
+        min-width: 280px;
+        max-width: 580px;
+        height: 240px !important;
+        min-height: 200px;
+        border-radius: 12px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6);
       }
       @keyframes fx-ripple-animation {
         to { transform: scale(4); opacity: 0; }
       }
       ${code}
     `;
-  }, [customCss, effect.cssCode, isCustomModified, isHoverSimulated, selectedColor, speedMultiplier]);
+  }, [customCss, effect.cssCode, isCustomModified, isHoverSimulated, selectedColor]);
 
   const { resolvedTheme } = useTheme();
   const isLightSite = resolvedTheme === 'light';
@@ -866,12 +1080,12 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                     transformOrigin: 'center center',
                     transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                   }}
-                  className={`relative flex items-center justify-center ${
+                  className={`relative flex items-center justify-center w-full max-w-[620px] ${
                     isHoverSimulated ? 'force-hover-mode' : ''
                   }`}
                 >
                   <div
-                    className="live-interactive-sandbox-render flex items-center justify-center max-w-full"
+                    className="live-interactive-sandbox-render w-full flex items-center justify-center"
                     dangerouslySetInnerHTML={{ __html: customHtml }}
                   />
                 </div>
@@ -906,6 +1120,13 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                     >
                       <Sliders className="w-3 h-3 shrink-0" />
                       <span className="truncate">Overview</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="frameworks"
+                      className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-sky-500 data-[state=active]:text-black text-muted-foreground font-semibold flex items-center justify-center gap-1 min-w-[80px]"
+                    >
+                      <Package className="w-3 h-3 shrink-0" />
+                      <span className="truncate">Export</span>
                     </TabsTrigger>
                     <TabsTrigger
                       value="css-editor"
@@ -973,7 +1194,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                       </div>
                       <Button
                         size="sm"
-                        onClick={() => copyToClipboard(customCss, 'css')}
+                        onClick={() => copyToClipboard(effectiveCss, 'css')}
                         className="h-8 bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs gap-1.5 shrink-0 self-start sm:self-center"
                       >
                         {copiedType === 'css' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
@@ -992,7 +1213,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => copyToClipboard(customHtml, 'html')}
+                        onClick={() => copyToClipboard(effectiveHtml, 'html')}
                         className="h-8 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 text-xs font-bold gap-1.5 shrink-0 self-start sm:self-center"
                       >
                         {copiedType === 'html' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
@@ -1004,11 +1225,102 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
                   {/* Integration Tip */}
                   <div className="p-3.5 rounded-xl bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/30 dark:border-amber-500/20 text-xs text-amber-900 dark:text-amber-200/90 space-y-1">
                     <div className="font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                      💡 8-Direction Resizing & Dragging:
+                      💡 Multi-Framework Component Export:
                     </div>
                     <p className="text-[11px] leading-relaxed text-muted-foreground">
-                      Grab any window border/corner to resize freely. Drag the top header to move the window anywhere on screen, or double-click the header to maximize!
+                      Switch to the <b>Export</b> tab above to export ready-to-use drop-in components for React (TSX), Vue 3, Svelte 5, or standalone HTML + CSS!
                     </p>
+                  </div>
+                </TabsContent>
+
+                {/* TAB: Frameworks & Export */}
+                <TabsContent value="frameworks" className="flex-1 flex flex-col min-h-0 m-0 overflow-hidden">
+                  {/* Framework Picker Bar */}
+                  <div className="p-2.5 border-b border-border/50 dark:border-border/30 bg-muted/60 dark:bg-[#121218] flex flex-wrap items-center justify-between gap-2 shrink-0">
+                    <div className="flex items-center gap-1 bg-muted/80 dark:bg-white/5 border border-border/80 dark:border-white/10 p-0.5 rounded-lg">
+                      <button
+                        onClick={() => setSelectedFramework('react')}
+                        className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all flex items-center gap-1.5 ${
+                          selectedFramework === 'react'
+                            ? 'bg-sky-500 text-black shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        <span>⚛️</span> React TSX
+                      </button>
+                      <button
+                        onClick={() => setSelectedFramework('vue')}
+                        className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all flex items-center gap-1.5 ${
+                          selectedFramework === 'vue'
+                            ? 'bg-emerald-500 text-black shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        <span>💚</span> Vue 3
+                      </button>
+                      <button
+                        onClick={() => setSelectedFramework('svelte')}
+                        className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all flex items-center gap-1.5 ${
+                          selectedFramework === 'svelte'
+                            ? 'bg-orange-500 text-black shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        <span>🧡</span> Svelte 5
+                      </button>
+                      <button
+                        onClick={() => setSelectedFramework('html')}
+                        className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all flex items-center gap-1.5 ${
+                          selectedFramework === 'html'
+                            ? 'bg-amber-500 text-black shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        <span>🌐</span> HTML + CSS
+                      </button>
+                    </div>
+
+                    <Button
+                      size="sm"
+                      onClick={() => copyToClipboard(currentFrameworkCode, selectedFramework as any)}
+                      className="h-7 text-xs font-bold bg-amber-500 hover:bg-amber-400 text-black gap-1.5"
+                    >
+                      {copiedType === selectedFramework ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copiedType === selectedFramework ? 'Copied Component!' : 'Copy Component'}
+                    </Button>
+                  </div>
+
+                  {/* Framework Code Preview with Syntax Highlighter */}
+                  <div className="flex-1 overflow-y-auto p-3 bg-slate-950 font-mono text-xs">
+                    <SyntaxHighlighter
+                      language={selectedFramework === 'html' ? 'html' : selectedFramework === 'react' ? 'tsx' : 'html'}
+                      style={oneDark}
+                      customStyle={{
+                        margin: 0,
+                        padding: '0.75rem',
+                        fontSize: '0.75rem',
+                        background: 'transparent',
+                      }}
+                      wrapLongLines
+                    >
+                      {currentFrameworkCode}
+                    </SyntaxHighlighter>
+                  </div>
+
+                  {/* Bottom Bar */}
+                  <div className="p-2.5 border-t border-border/50 dark:border-border/30 bg-muted/40 dark:bg-[#0c0c11] flex items-center justify-between gap-2 shrink-0">
+                    <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-amber-500" />
+                      <span>Synchronized in real-time with your live CSS and HTML edits</span>
+                    </span>
+                    <Button
+                      size="sm"
+                      onClick={() => copyToClipboard(currentFrameworkCode, selectedFramework as any)}
+                      className="h-7 text-xs font-bold bg-amber-500 hover:bg-amber-400 text-black gap-1.5"
+                    >
+                      {copiedType === selectedFramework ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copiedType === selectedFramework ? 'Copied!' : 'Copy Code'}
+                    </Button>
                   </div>
                 </TabsContent>
 

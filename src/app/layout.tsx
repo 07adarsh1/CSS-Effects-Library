@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 import "@/styles/effects.css";
 import "@/styles/effects-extra.css";
@@ -17,9 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CSSHUB — 72+ Curated CSS Effects with Live Studio",
+  title: "CSSHUB — 150+ Curated CSS Effects with Live Studio",
   description:
-    "CSSHUB: A modern library of 72+ beautiful, production-ready CSS effects with 8-way resizable Live Studio, real-time code editing, and 1-click export. Browse, customize, and copy code instantly.",
+    "CSSHUB: A modern library of 150+ beautiful, production-ready CSS effects with 8-way resizable Live Studio, real-time code editing, and 1-click export. Browse, customize, and copy code instantly.",
   keywords: [
     "CSS effects",
     "CSS animations",
@@ -50,6 +50,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        suppressHydrationWarning
       >
         <ThemeProvider
           attribute="class"
