@@ -1,42 +1,45 @@
 # CSSHUB 🎨✨
 
-A curated, interactive CSS & UI Effects Library and Live Studio with **150+ production-ready CSS effects** across 10 categories, built with Next.js 16, React 19, Tailwind CSS, and Framer Motion.
+A modern, interactive CSS & UI Effects Library and Live Studio featuring **150+ production-ready CSS effects** across 10 categories. Built with **Next.js 16 (Turbopack)**, **React 19**, **Tailwind CSS v4**, and **Framer Motion**.
 
-![CSSHUB Showcase Preview](public/screenshots/csshub-hero.png)
+![CSSHUB Hero Showcase](public/screenshots/csshub-hero.png)
 
 ---
 
 ## 🚀 Key Features
 
-- **⚡ 8-Way Resizable Desktop Live Studio**: Click any component to open a desktop-grade sandbox that can be resized from all 4 borders and 4 corners, dragged by its header, or maximized to fullscreen without lag.
-- **↔️ Draggable Split-Pane Divider**: Adjust canvas vs editor widths freely with instant reactive resizing.
+- **📱 Fully Mobile & Desktop Responsive**:
+  - **Mobile (< 768px)**: Automatically switches to an adaptive full-screen studio app shell with a touch-friendly segmented tab bar (`Canvas`, `Details`, `Export`, `Live CSS`, `Live HTML`, `Code`).
+  - **Desktop (≥ 768px)**: 8-way resizable sandbox that can be resized from all 4 borders and 4 corners, dragged by its header, or maximized to fullscreen.
+- **📌 Persistent Sticky Search & Category Bar**: Fluid, translucent glassmorphism bar with smooth horizontal category swiping that sticks right below the header on scroll.
+- **🔝 Instant Return to Top**: Click the logo or brand text in the top navigation bar, hero, or footer to smoothly scroll back to top.
+- **↔️ Draggable Split-Pane Divider**: Adjust canvas vs editor widths freely with instant reactive resizing on desktop.
 - **⚛️ Multi-Framework Code Exporter**: 1-click export for **React (TSX)**, **Vue 3 SFC**, **Svelte 5 Runes**, and standalone **HTML + CSS**.
 - **🎨 Real-Time CSS & HTML Live Editors**: Edit CSS stylesheet rules and HTML element markup in real-time with instant hot preview.
 - **🌈 Canvas Customizer & Environment Themes**: Preview components in Dark, Pitch Black, Light, Grid, Dotted Matrix, or Gradient themes.
 - **⚡ Accent Tint & Speed Controls**: Dynamically change accent color palettes, adjust animation speeds (0.5x, 1x, 2x), and zoom scales (0.75x to 1.5x).
-- **🔒 Simulate Hover Lock**: Lock and inspect hover animations continuously without keeping your mouse on the element.
-- **🏹 Infused Category Navigation Bar**: Smooth scrolling category pills with integrated `<` and `>` arrow buttons and subtle gradient edge fades.
+- **🔒 Simulate Hover Lock**: Lock and inspect hover animations continuously without keeping your mouse on the element (essential for mobile & touch testing).
+- **🏹 Infused Category Navigation Bar**: Smooth scrolling category pills with integrated `<` and `>` arrow controls and subtle edge fades.
 - **⌨️ Keyboard Navigation**: Press `←` and `→` in the Live Studio to effortlessly browse and test all 150+ effects in interactive mode.
-- **150+ Curated CSS Effects**: Hover effects, loading spinners, glowing borders, glassmorphism, 3D cards, text animations, 40 modern UI components, and advanced effects.
 - **♥ Favorites System**: Save and filter your favorite effects using persistent local storage.
-- **📦 1-Click Copy & Export**: Instant 1-click copy for pure CSS, HTML, and all frameworks.
-- **🌙 Dark & Light Mode**: Built-in sleek dark theme and crisp light theme.
+- **📦 1-Click Copy & Export**: Instant 1-click copy for pure CSS, HTML, and all modern frameworks.
+- **🌙 Dark & Light Mode**: Built-in sleek dark theme and crisp light theme with zero-flicker transitions.
 
 ---
 
 ## 📸 Screenshots & Previews
 
-| CSSHUB Hero & Ambient Showcase | 8-Way Resizable Live Studio |
+| 🌌 Dark Mode Hero & Ambience | ☀️ Crisp Light Theme Mode |
 | :---: | :---: |
-| ![Hero Showcase](public/screenshots/csshub-hero.png) | ![Live Studio](public/screenshots/csshub-studio-overview.png) |
+| ![Hero Dark Showcase](public/screenshots/csshub-hero.png) | ![Light Theme](public/screenshots/screenshot-light.png) |
 
-| Realtime Live CSS Editor | Realtime Live HTML Editor |
+| ⚡ 8-Way Resizable Live Studio | ⚛️ Multi-Framework Exporter (React / Vue / Svelte) |
 | :---: | :---: |
-| ![Live CSS Editor](public/screenshots/csshub-live-css.png) | ![Live HTML Editor](public/screenshots/csshub-live-html.png) |
+| ![Live Studio Overview](public/screenshots/csshub-studio-overview.png) | ![Live CSS Editor](public/screenshots/csshub-live-css.png) |
 
-| Multi-Axis Resized Window | Light Theme Mode |
+| 🎨 Realtime Live Code Editors | 📌 Scrolled Effects Grid & Sticky Bar |
 | :---: | :---: |
-| ![Resized Live Studio](public/screenshots/csshub-studio-resized.png) | ![Light Theme](public/screenshots/screenshot-light.png) |
+| ![Live HTML Editor](public/screenshots/csshub-live-html.png) | ![Effects Grid](public/screenshots/screenshot-dark.png) |
 
 ---
 
@@ -57,12 +60,12 @@ A curated, interactive CSS & UI Effects Library and Live Studio with **150+ prod
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router & Turbopack)
 - **UI & Styling**: [React 19](https://react.dev/), [Tailwind CSS v4](https://tailwindcss.com/), [Radix UI](https://radix-ui.com/), [Lucide Icons](https://lucide.dev/)
 - **Split Panels**: [react-resizable-panels](https://github.com/bvaughn/react-resizable-panels)
-- **Animations**: Framer Motion & Pure CSS3
-- **State Management**: [Zustand](https://zustand-demo.pmnd.rs/) (with LocalStorage persist)
-- **Code Highlighting**: [React Syntax Highlighter](https://github.com/react-syntax-highlighter/react-syntax-highlighter)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/) & Pure CSS3 Animations
+- **State Management**: [Zustand](https://zustand-demo.pmnd.rs/) (with LocalStorage persistence)
+- **Syntax Highlighting**: [React Syntax Highlighter](https://github.com/react-syntax-highlighter/react-syntax-highlighter) (Prism engine)
 
 ---
 
@@ -84,11 +87,12 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3005](http://localhost:3005) in your browser to view CSSHUB.
+Open [http://localhost:3000](http://localhost:3000) in your browser to view CSSHUB.
 
 ### 4. Build for Production
 ```bash
 npm run build
+npm run start
 ```
 
 ---
@@ -96,10 +100,9 @@ npm run build
 ## 📁 Project Structure
 
 ```
-d:\CSSHUB/
+CSSHUB/
 ├── public/
-│   ├── next.svg
-│   ├── vercel.svg
+│   ├── logo.svg
 │   └── screenshots/              # Screenshots and visual previews
 ├── src/
 │   ├── app/                      # Next.js App Router (layout.tsx, page.tsx, globals.css)
@@ -107,15 +110,12 @@ d:\CSSHUB/
 │   │   ├── css-effects/          # CSSHUB components (EffectsShowcase, LiveStudioModal, EffectCard, etc.)
 │   │   └── ui/                   # Radix UI primitives (button, resizable, dialog, tabs, tooltip, etc.)
 │   ├── hooks/                    # Custom React hooks (use-mobile, use-toast)
-│   ├── lib/                      # Data & state (effects-data, effects-extra-data, store, utils)
+│   ├── lib/                      # Data & state (effects-data, effects-extra-data, store, export-generators)
 │   └── styles/                   # CSS rules (effects.css, effects-extra.css)
-├── .gitignore
-├── AGENTS.md
 ├── components.json
 ├── eslint.config.mjs
 ├── next.config.ts
 ├── package.json
-├── package-lock.json
 ├── postcss.config.mjs
 ├── README.md
 ├── tailwind.config.ts
