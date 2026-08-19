@@ -2,7 +2,7 @@
 
 A modern, interactive CSS & UI Effects Library and Live Studio featuring **150+ production-ready CSS effects** across 10 categories. Built with **Next.js 16 (Turbopack)**, **React 19**, **Tailwind CSS v4**, and **Framer Motion**.
 
-![CSSHUB Hero Showcase](public/screenshots/csshub-hero.png)
+![CSSHUB Hero Showcase](public/screenshots/csshub-hero-dark.png)
 
 ---
 
@@ -31,15 +31,16 @@ A modern, interactive CSS & UI Effects Library and Live Studio featuring **150+ 
 
 | 🌌 Dark Mode Hero & Ambience | ☀️ Crisp Light Theme Mode |
 | :---: | :---: |
-| ![Hero Dark Showcase](public/screenshots/csshub-hero.png) | ![Light Theme](public/screenshots/screenshot-light.png) |
+| ![Hero Dark Showcase](public/screenshots/csshub-hero-dark.png) | ![Hero Light Showcase](public/screenshots/csshub-hero-light.png) |
 
-| ⚡ 8-Way Resizable Live Studio | ⚛️ Multi-Framework Exporter (React / Vue / Svelte) |
+| ⚡ Live Studio Overview & 1-Click Copy | ⚛️ Multi-Framework Exporter (React / Vue / Svelte) |
 | :---: | :---: |
-| ![Live Studio Overview](public/screenshots/csshub-studio-overview.png) | ![Live CSS Editor](public/screenshots/csshub-live-css.png) |
+| ![Live Studio Overview](public/screenshots/csshub-studio-overview.png) | ![Multi-Framework Exporter](public/screenshots/csshub-studio-export.png) |
 
-| 🎨 Realtime Live Code Editors | 📌 Scrolled Effects Grid & Sticky Bar |
-| :---: | :---: |
-| ![Live HTML Editor](public/screenshots/csshub-live-html.png) | ![Effects Grid](public/screenshots/screenshot-dark.png) |
+<p align="center">
+  <b>📌 Scrolled 150+ Effects Grid &amp; Sticky Category Bar</b><br/>
+  <img src="public/screenshots/csshub-sticky-grid.png" alt="Sticky Category Filter Bar &amp; Grid" width="100%" />
+</p>
 
 ---
 
