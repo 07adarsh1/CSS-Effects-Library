@@ -22,6 +22,7 @@ import {
   Columns,
   Rows,
   Package,
+  Monitor,
 } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -43,6 +44,7 @@ import {
 } from '@/components/ui/resizable';
 import { useTheme } from 'next-themes';
 import { Logo } from './Logo';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface LiveStudioModalProps {
   effect: CSSEffect | null;
@@ -53,6 +55,7 @@ interface LiveStudioModalProps {
 
 type BackgroundTheme = 'dark' | 'black' | 'light' | 'grid' | 'dots' | 'gradient';
 type ResizeDirection = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
+type MobileTab = 'canvas' | 'overview' | 'frameworks' | 'css-editor' | 'html-editor' | 'syntax';
 
 const PRESET_COLORS = [
   { name: 'Amber', hex: '#f59e0b', rgb: '245, 158, 11' },
@@ -70,7 +73,9 @@ interface LiveStudioContentProps {
 }
 
 function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioContentProps) {
+  const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState<'overview' | 'frameworks' | 'css-editor' | 'html-editor' | 'syntax'>('overview');
+  const [mobileTab, setMobileTab] = useState<MobileTab>('canvas');
   const [selectedFramework, setSelectedFramework] = useState<'react' | 'vue' | 'svelte' | 'html'>('react');
   const [bgTheme, setBgTheme] = useState<BackgroundTheme>('dark');
   const [scale, setScale] = useState<number>(1);
@@ -130,7 +135,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
     }
   }, [selectedFramework, reactCode, vueCode, svelteCode, standaloneHtmlCode]);
 
-  // 8-Direction Window Resizing & Dragging State
+  // 8-Direction Window Resizing & Dragging State (Desktop only)
   const [isMaximized, setIsMaximized] = useState<boolean>(false);
   const [windowBounds, setWindowBounds] = useState<{ width: number; height: number; x: number; y: number }>(() => {
     if (typeof window !== 'undefined') {
@@ -200,6 +205,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
 
   // Handle Drag Move & Resize Move globally with requestAnimationFrame
   useEffect(() => {
+    if (isMobile) return;
     let animId: number;
 
     const handlePointerMove = (e: PointerEvent) => {
@@ -262,37 +268,18 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
 
     window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('pointerup', handlePointerUp);
-    window.addEventListener('pointercancel', handlePointerUp);
-
     return () => {
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
-      window.removeEventListener('pointercancel', handlePointerUp);
       cancelAnimationFrame(animId);
     };
-  }, []);
+  }, [isMobile]);
 
-  const handleStartResize = (direction: ResizeDirection, e: React.PointerEvent) => {
-    if (isMaximized) return;
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDraggingOrResizing(true);
-    activeActionRef.current = {
-      type: 'resize',
-      direction,
-      startX: e.clientX,
-      startY: e.clientY,
-      startW: windowBounds.width,
-      startH: windowBounds.height,
-      startXPos: windowBounds.x,
-      startYPos: windowBounds.y,
-    };
-  };
-
+  // Start Header Dragging (Desktop)
   const handleStartHeaderDrag = (e: React.PointerEvent) => {
-    if (isMaximized) return;
-    const target = e.target as HTMLElement;
-    if (target.closest('button, input, textarea, select, a, [role="tab"]')) return;
+    if (isMaximized || isMobile) return;
+    if ((e.target as HTMLElement).closest('button, input, textarea, a')) return;
+
     e.preventDefault();
     setIsDraggingOrResizing(true);
     activeActionRef.current = {
@@ -306,9 +293,30 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
     };
   };
 
+  // Start 8-way resizing (Desktop)
+  const handleStartResize = (direction: ResizeDirection, e: React.PointerEvent) => {
+    if (isMaximized || isMobile) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    setIsDraggingOrResizing(true);
+    activeActionRef.current = {
+      type: 'resize',
+      direction,
+      startX: e.clientX,
+      startY: e.clientY,
+      startW: windowBounds.width,
+      startH: windowBounds.height,
+      startXPos: windowBounds.x,
+      startYPos: windowBounds.y,
+    };
+  };
+
+  // Toggle Maximize Window
   const toggleMaximize = () => {
+    if (isMobile) return;
     if (!isMaximized) {
-      preMaximizeRef.current = windowBounds;
+      preMaximizeRef.current = { ...windowBounds };
       setIsMaximized(true);
     } else {
       setIsMaximized(false);
@@ -316,187 +324,156 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
     }
   };
 
-  const copyToClipboard = async (text: string, type: 'css' | 'html' | 'react' | 'vue' | 'svelte' | 'standalone') => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopiedType(type);
-      const label = type === 'standalone' ? 'HTML + CSS' : type.toUpperCase();
-      toast.success(`${label} copied to clipboard!`);
-      setTimeout(() => setCopiedType(null), 2000);
-    } catch {
-      toast.error('Failed to copy code');
-    }
-  };
-
   const handleResetCode = () => {
     setCustomCss(effect.cssCode);
     setCustomHtml(effect.htmlCode);
     setIsCustomModified(false);
-    setIsHoverSimulated(false);
+    setSelectedColor('#f59e0b');
     setScale(1);
     setSpeedMultiplier(1);
-    setSelectedColor('#f59e0b');
-    setRenderKey((prev) => prev + 1);
-    toast.info('Reset code and settings to defaults');
+    setIsHoverSimulated(false);
+    setRenderKey((k) => k + 1);
+    toast.info('Studio reset to original effect styles');
   };
 
   const handleReplay = () => {
-    setRenderKey((prev) => prev + 1);
+    setRenderKey((k) => k + 1);
+    toast.success('Animation replayed');
   };
 
-  // Interactive sandbox click handler
+  const copyToClipboard = async (
+    text: string,
+    type: 'css' | 'html' | 'react' | 'vue' | 'svelte' | 'standalone'
+  ) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedType(type);
+      toast.success(`${type.toUpperCase()} copied to clipboard!`);
+      setTimeout(() => setCopiedType(null), 2000);
+    } catch {
+      toast.error('Failed to copy');
+    }
+  };
+
+  // Dynamic interactive sandbox handlers
   const handleSandboxClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
 
-    // 1. Toggle switch simulation (card or direct switch)
-    const toggleCard = target.closest('.toggle-card, .fx-toggle-card');
-    if (toggleCard) {
-      const sw = toggleCard.querySelector('.toggle-switch, .fx-toggle-switch');
-      if (sw) sw.classList.toggle('active');
-      return;
-    }
-
-    const toggleEl = target.closest('.toggle-switch, .switch-toggle, .custom-toggle, .fx-toggle-switch');
-    if (toggleEl) {
-      toggleEl.classList.toggle('active');
-      return;
-    }
-
-    // 2. Accordion expand / collapse
-    const accordionEl = target.closest('.accordion-item, .fx-accordion-item, .accordion-header');
-    if (accordionEl) {
-      const item = accordionEl.classList.contains('accordion-item') || accordionEl.classList.contains('fx-accordion-item')
-        ? accordionEl
-        : accordionEl.closest('.accordion-item, .fx-accordion-item');
-      if (item) {
-        item.classList.toggle('open');
-      }
-      return;
-    }
-
-    // 3. Sliding tabs selection
-    const tabEl = target.closest('.tab-item, .fx-tab-item, .sliding-tabs button, .fx-sliding-tabs button');
-    if (tabEl) {
-      const parent = tabEl.parentElement;
-      if (parent) {
-        parent.querySelectorAll('.tab-item, .fx-tab-item, button').forEach((btn) => {
-          btn.classList.remove('active');
-        });
-        tabEl.classList.add('active');
-      }
-      return;
-    }
-
-    // 4. Rating stars
-    const starBtn = target.closest('.star-btn, .fx-star-btn, .star, .rating-star');
-    if (starBtn) {
-      const parent = starBtn.parentElement;
-      if (parent) {
-        const stars = Array.from(parent.querySelectorAll('.star-btn, .fx-star-btn, .star, .rating-star'));
-        const idx = stars.indexOf(starBtn);
-        if (idx !== -1) {
-          stars.forEach((s, i) => {
-            if (i <= idx) {
-              s.classList.add('filled', 'active');
-            } else {
-              s.classList.remove('filled', 'active');
-            }
-          });
-        }
-      }
-      return;
-    }
-
-    // 5. Step progress tracker nodes
-    const stepNode = target.closest('.step-node, .fx-step-node');
-    if (stepNode) {
-      const tracker = stepNode.closest('.step-tracker, .fx-step-tracker');
-      if (tracker) {
-        const nodes = Array.from(tracker.querySelectorAll('.step-node, .fx-step-node'));
-        const lines = Array.from(tracker.querySelectorAll('.step-line, .fx-step-line'));
-        const clickedIdx = nodes.indexOf(stepNode);
-        if (clickedIdx !== -1) {
-          nodes.forEach((n, i) => {
-            if (i < clickedIdx) {
-              n.className = 'step-node completed';
-              n.textContent = '✓';
-            } else if (i === clickedIdx) {
-              n.className = 'step-node active';
-              n.textContent = `${i + 1}`;
-            } else {
-              n.className = 'step-node';
-              n.textContent = `${i + 1}`;
-            }
-          });
-          lines.forEach((l, i) => {
-            if (i < clickedIdx) {
-              l.className = 'step-line filled';
-            } else {
-              l.className = 'step-line';
-            }
-          });
-        }
-      }
-      return;
-    }
-
-    // 6. Checkbox auto-toggle (labels handle native toggle; only handle non-label wrappers)
-    const checkboxWrap = target.closest('.checkbox-card, .checkbox-anim, .fx-checkbox-anim');
-    if (checkboxWrap) {
-      if (!target.closest('label')) {
-        const input = checkboxWrap.querySelector('input[type="checkbox"]') as HTMLInputElement;
-        if (input && target !== input) {
-          input.checked = !input.checked;
-          input.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-      }
-      return;
-    }
-
-    // 7. 3D Flip Card toggle
-    const flipCard = target.closest('.perspective-card, .flip-card, .fx-flip-card');
-    if (flipCard) {
-      flipCard.classList.toggle('flipped');
-      return;
-    }
-
-    // 8. Ripple effect simulation
-    const rippleBtn = target.closest('.ripple-btn, .fx-ripple-btn, .fill-slide-up, button');
-    if (rippleBtn && effect.id.includes('ripple')) {
-      const rect = rippleBtn.getBoundingClientRect();
+    // 1. Ripple Buttons
+    const rippleBtn = target.closest('.ripple-btn, .fx-ripple-btn') as HTMLElement;
+    if (rippleBtn) {
       const circle = document.createElement('span');
-      circle.className = 'fx-ripple ripple-effect';
-      const size = Math.max(rect.width, rect.height);
-      circle.style.width = circle.style.height = `${size}px`;
-      circle.style.left = `${e.clientX - rect.left - size / 2}px`;
-      circle.style.top = `${e.clientY - rect.top - size / 2}px`;
+      const diameter = Math.max(rippleBtn.clientWidth, rippleBtn.clientHeight);
+      const radius = diameter / 2;
+      const rect = rippleBtn.getBoundingClientRect();
+      circle.style.width = circle.style.height = `${diameter}px`;
+      circle.style.left = `${e.clientX - rect.left - radius}px`;
+      circle.style.top = `${e.clientY - rect.top - radius}px`;
       circle.style.position = 'absolute';
       circle.style.borderRadius = '50%';
-      circle.style.background = 'rgba(255,255,255,0.7)';
+      circle.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
       circle.style.transform = 'scale(0)';
-      circle.style.animation = 'fx-ripple-animation 0.6s linear';
+      circle.style.animation = 'fx-ripple-animation 600ms linear';
       circle.style.pointerEvents = 'none';
+
+      const existingRipple = rippleBtn.querySelector('.fx-dynamic-ripple');
+      if (existingRipple) existingRipple.remove();
+      circle.classList.add('fx-dynamic-ripple');
       rippleBtn.appendChild(circle);
       setTimeout(() => circle.remove(), 600);
       return;
     }
 
-    // 9. Segmented Control Switcher
-    const segBtn = target.closest('.segmented-btn, .fx-segmented-btn');
-    if (segBtn) {
-      const parent = segBtn.parentElement;
-      if (parent) {
-        parent.querySelectorAll('.segmented-btn, .fx-segmented-btn').forEach((b) => b.classList.remove('active'));
-        segBtn.classList.add('active');
+    // 2. Accordions
+    const accordionHeader = target.closest('.accordion-header, .fx-accordion-header');
+    if (accordionHeader) {
+      const item = accordionHeader.closest('.accordion-item, .fx-accordion-item');
+      if (item) item.classList.toggle('open');
+      return;
+    }
+
+    // 3. Tab bar items
+    const tabItem = target.closest('.sliding-tab-btn, .tab-item, .fx-tab-item');
+    if (tabItem) {
+      const container = tabItem.closest('.sliding-tabs, .tabs-wrap, .fx-sliding-tabs');
+      if (container) {
+        container.querySelectorAll('.sliding-tab-btn, .tab-item, .fx-tab-item').forEach((b) => b.classList.remove('active'));
+        tabItem.classList.add('active');
       }
+      return;
+    }
+
+    // 4. Segmented Control items
+    const segItem = target.closest('.segmented-item, .fx-segmented-item');
+    if (segItem) {
+      const group = segItem.closest('.segmented-control, .fx-segmented-control');
+      if (group) {
+        group.querySelectorAll('.segmented-item, .fx-segmented-item').forEach((b) => b.classList.remove('active'));
+        segItem.classList.add('active');
+      }
+      return;
+    }
+
+    // 5. Star Rating
+    const starBtn = target.closest('.star-btn, .fx-star-btn');
+    if (starBtn) {
+      const parent = starBtn.closest('.rating-stars, .fx-rating-stars');
+      if (parent) {
+        const stars = Array.from(parent.querySelectorAll('.star-btn, .fx-star-btn'));
+        const idx = stars.indexOf(starBtn);
+        stars.forEach((s, i) => {
+          s.classList.toggle('active', i <= idx);
+        });
+      }
+      return;
+    }
+
+    // 6. Toast trigger
+    const toastTrigger = target.closest('.toast-trigger-btn, .fx-toast-trigger');
+    if (toastTrigger) {
+      const toastEl = toastTrigger.parentElement?.querySelector('.interactive-toast, .fx-interactive-toast');
+      if (toastEl) {
+        toastEl.classList.add('show');
+        setTimeout(() => toastEl.classList.remove('show'), 3000);
+      }
+      return;
+    }
+
+    // 7. FAB Menu
+    const fabMain = target.closest('.fab-main-btn, .fx-fab-main');
+    if (fabMain) {
+      const fabWrap = fabMain.closest('.fab-container, .fx-fab-container');
+      if (fabWrap) fabWrap.classList.toggle('open');
+      return;
+    }
+
+    // 8. Radial Action Wheel
+    const radialCenter = target.closest('.radial-menu-center, .fx-radial-center');
+    if (radialCenter) {
+      const radialWrap = radialCenter.closest('.radial-menu-wrap, .fx-radial-menu');
+      if (radialWrap) radialWrap.classList.toggle('open');
+      return;
+    }
+
+    // 9. Modal Backdrop / Triggers
+    const modalTrigger = target.closest('.modal-trigger-btn, .fx-modal-trigger');
+    if (modalTrigger) {
+      const modalEl = modalTrigger.parentElement?.querySelector('.frosted-modal-overlay, .fx-frosted-modal');
+      if (modalEl) modalEl.classList.add('open');
+      return;
+    }
+    const modalClose = target.closest('.modal-close-btn, .fx-modal-close');
+    if (modalClose) {
+      const modalEl = modalClose.closest('.frosted-modal-overlay, .fx-frosted-modal');
+      if (modalEl) modalEl.classList.remove('open');
       return;
     }
 
     // 10. Audio Waveform Player Play/Pause
     const audioBtn = target.closest('.audio-play-btn, .fx-audio-play-btn');
     if (audioBtn) {
-      const isPlaying = audioBtn.textContent?.includes('❚❚');
-      audioBtn.textContent = isPlaying ? '▶' : '❚❚';
+      const isPlaying = audioBtn.classList.toggle('playing');
+      audioBtn.textContent = isPlaying ? '❚❚' : '▶';
       const player = audioBtn.closest('.audio-player, .fx-audio-player');
       if (player) {
         const bars = player.querySelectorAll('.waveform-bar, .fx-waveform-bar');
@@ -714,7 +691,7 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
       .live-interactive-sandbox-render > [class*="bg-"],
       .live-interactive-sandbox-render > [class*="-bg"] {
         width: 100% !important;
-        min-width: 280px;
+        min-width: 260px;
         max-width: 580px;
         height: 240px !important;
         min-height: 200px;
@@ -730,9 +707,6 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
       ${code}
     `;
   }, [customCss, effect.cssCode, isCustomModified, isHoverSimulated, selectedColor]);
-
-  const { resolvedTheme } = useTheme();
-  const isLightSite = resolvedTheme === 'light';
 
   const getCanvasBgClass = () => {
     switch (bgTheme) {
@@ -752,6 +726,495 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
     }
   };
 
+  // Reusable Canvas Component (Used in both Desktop Panel & Mobile Tab)
+  const renderCanvasView = (isMobileCanvas: boolean) => (
+    <div className="flex flex-col h-full min-h-0 bg-muted/20 dark:bg-[#0a0a0e] overflow-hidden">
+      {/* Toolbar Row 1: Themes + Zoom + Speed + Replay */}
+      <div className="flex items-center justify-between px-3 sm:px-4 py-2 bg-muted/50 dark:bg-[#121218] border-b border-border/50 dark:border-border/30 gap-2 overflow-x-auto scrollbar-none shrink-0">
+        {/* Canvas Theme Selector */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="text-[11px] text-muted-foreground font-medium flex items-center gap-1">
+            <Layers className="w-3.5 h-3.5 text-amber-500" />
+            <span className="hidden sm:inline">Canvas:</span>
+          </span>
+          <div className="flex items-center gap-0.5 bg-muted/80 dark:bg-black/50 p-0.5 rounded-lg border border-border/80 dark:border-white/10">
+            {(['dark', 'black', 'light', 'grid', 'dots', 'gradient'] as BackgroundTheme[]).map((bg) => (
+              <button
+                key={bg}
+                onClick={() => setBgTheme(bg)}
+                className={`px-2 py-0.5 rounded text-[10px] font-medium capitalize transition-all ${
+                  bgTheme === bg
+                    ? 'bg-amber-500 text-black font-semibold shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {bg}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Transformations: Zoom + Speed + Replay */}
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1 bg-muted/80 dark:bg-black/50 p-0.5 rounded-lg border border-border/80 dark:border-white/10 text-[10px]">
+            <span className="text-muted-foreground pl-1.5 pr-0.5 hidden xs:inline">Zoom:</span>
+            {[0.75, 1, 1.25, 1.5].map((s) => (
+              <button
+                key={s}
+                onClick={() => setScale(s)}
+                className={`px-1.5 py-0.5 rounded transition-all ${
+                  scale === s
+                    ? 'bg-background dark:bg-white/20 text-foreground dark:text-white font-semibold shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {s}x
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-1 bg-muted/80 dark:bg-black/50 p-0.5 rounded-lg border border-border/80 dark:border-white/10 text-[10px]">
+            <span className="text-muted-foreground pl-1.5 pr-0.5 hidden xs:inline">Speed:</span>
+            {[0.5, 1, 2].map((sp) => (
+              <button
+                key={sp}
+                onClick={() => setSpeedMultiplier(sp)}
+                className={`px-1.5 py-0.5 rounded transition-all ${
+                  speedMultiplier === sp
+                    ? 'bg-background dark:bg-white/20 text-foreground dark:text-white font-semibold shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {sp}x
+              </button>
+            ))}
+          </div>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleReplay}
+            className="h-7 w-7 text-muted-foreground hover:text-amber-500 hover:bg-muted dark:hover:bg-white/5"
+            title="Replay Animation"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Toolbar Row 2: Color Palette + Hover Simulator */}
+      <div className="flex items-center justify-between px-3 sm:px-4 py-1.5 bg-muted/30 dark:bg-[#0f0f15] border-b border-border/40 dark:border-border/20 text-[11px] gap-2 overflow-x-auto scrollbar-none shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-muted-foreground flex items-center gap-1 font-medium text-[11px]">
+            <Palette className="w-3.5 h-3.5 text-amber-500" />
+            <span className="hidden sm:inline">Accent Tint:</span>
+          </span>
+          <div className="flex items-center gap-1.5">
+            {PRESET_COLORS.map((c) => (
+              <button
+                key={c.name}
+                onClick={() => setSelectedColor(c.hex)}
+                className={`w-4 h-4 rounded-full border transition-all ${
+                  selectedColor === c.hex
+                    ? 'scale-125 border-foreground dark:border-white shadow-xs ring-1 ring-foreground/40 dark:ring-white/50'
+                    : 'border-transparent opacity-65 hover:opacity-100 hover:scale-110'
+                }`}
+                style={{ backgroundColor: c.hex }}
+                title={c.name}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => setIsHoverSimulated(!isHoverSimulated)}
+            className={`px-2.5 py-1 rounded-lg border text-[11px] font-medium transition-all flex items-center gap-1.5 ${
+              isHoverSimulated
+                ? 'bg-amber-500/20 border-amber-500/60 text-amber-600 dark:text-amber-400 shadow-xs'
+                : 'border-border/80 dark:border-white/10 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/5'
+            }`}
+          >
+            <Sparkles className="w-3 h-3" />
+            <span>{isHoverSimulated ? 'Hover Locked' : 'Simulate Hover'}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Live Interactive Canvas Body */}
+      <div
+        id="live-studio-canvas-root"
+        key={`canvas-${renderKey}-${effect.id}`}
+        onClick={handleSandboxClick}
+        onMouseMove={handleSandboxMouseMove}
+        onInput={handleSandboxInput}
+        onKeyDown={handleSandboxKeyDown}
+        className={`relative flex-1 flex items-center justify-center p-4 sm:p-10 overflow-auto transition-colors duration-300 min-h-[220px] ${getCanvasBgClass()}`}
+      >
+        {/* Injected Scoped Styles */}
+        <style dangerouslySetInnerHTML={{ __html: previewScopedCss }} />
+
+        {/* Scaling Container */}
+        <div
+          style={{
+            transform: `scale(${scale})`,
+            transformOrigin: 'center center',
+            transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          }}
+          className={`relative flex items-center justify-center w-full max-w-[620px] ${
+            isHoverSimulated ? 'force-hover-mode' : ''
+          }`}
+        >
+          <div
+            className="live-interactive-sandbox-render w-full flex items-center justify-center"
+            dangerouslySetInnerHTML={{ __html: customHtml }}
+          />
+        </div>
+
+        {/* Bottom Sandbox Live Badge */}
+        <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-background/80 dark:bg-black/60 backdrop-blur-md border border-border/80 dark:border-white/10 text-[10px] text-foreground/80 dark:text-muted-foreground pointer-events-none">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span>Live Sandbox &middot; tap / click to test</span>
+        </div>
+
+        {/* Mobile Quick Action Floating Pill */}
+        {isMobileCanvas && (
+          <div className="absolute bottom-3 right-3 flex items-center gap-1.5 z-20">
+            <Button
+              size="sm"
+              onClick={() => copyToClipboard(effectiveCss, 'css')}
+              className="h-7 text-[10px] font-bold bg-amber-500 hover:bg-amber-400 text-black px-2.5 rounded-lg shadow-md gap-1"
+            >
+              {copiedType === 'css' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+              <span>Copy CSS</span>
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setMobileTab('frameworks')}
+              className="h-7 text-[10px] font-bold bg-background/80 dark:bg-black/80 backdrop-blur-md border-white/20 text-foreground px-2.5 rounded-lg shadow-md gap-1"
+            >
+              <Package className="w-3 h-3 text-sky-400" />
+              <span>Export</span>
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  // Reusable Tabs Content for Inspector / Code Panel
+  const renderTabContent = () => (
+    <>
+      {/* TAB 1: Overview & 1-Click Code Actions */}
+      <TabsContent value="overview" className="flex-1 flex flex-col p-4 space-y-3.5 overflow-y-auto m-0 min-h-0">
+        {/* Metadata Box */}
+        <div className="p-3.5 rounded-xl bg-muted/30 dark:bg-white/[0.03] border border-border/80 dark:border-white/10 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Effect Details
+            </h4>
+            {isCustomModified && (
+              <button
+                onClick={handleResetCode}
+                className="text-[10px] text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-300 flex items-center gap-1 font-medium bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20"
+              >
+                <RotateCcw className="w-2.5 h-2.5" /> Reset Code
+              </button>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            {effect.description}
+          </p>
+          <div className="flex flex-wrap gap-2 pt-1 text-[11px]">
+            <span className="px-2.5 py-0.5 rounded-md bg-muted/70 dark:bg-white/5 border border-border/80 dark:border-white/10 text-muted-foreground">
+              Category: <b className="text-amber-500 dark:text-amber-400 capitalize">{effect.category}</b>
+            </span>
+            <span className="px-2.5 py-0.5 rounded-md bg-muted/70 dark:bg-white/5 border border-border/80 dark:border-white/10 text-muted-foreground">
+              ID: <code className="text-emerald-600 dark:text-emerald-400 font-mono">{effect.id}</code>
+            </span>
+          </div>
+        </div>
+
+        {/* 1-Click Code Copy Cards */}
+        <div className="space-y-2.5">
+          {/* CSS Card */}
+          <div className="p-3.5 rounded-xl bg-muted/30 dark:bg-white/[0.03] border border-border/80 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="min-w-0">
+              <div className="text-xs font-bold text-amber-500 dark:text-amber-400">CSS Stylesheet Rules</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">
+                Pure CSS class definition & keyframe animations
+              </div>
+            </div>
+            <Button
+              size="sm"
+              onClick={() => copyToClipboard(effectiveCss, 'css')}
+              className="h-8 bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs gap-1.5 shrink-0 self-start sm:self-center"
+            >
+              {copiedType === 'css' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              {copiedType === 'css' ? 'Copied!' : 'Copy CSS'}
+            </Button>
+          </div>
+
+          {/* HTML Card */}
+          <div className="p-3.5 rounded-xl bg-muted/30 dark:bg-white/[0.03] border border-border/80 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="min-w-0">
+              <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400">HTML Element Markup</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">
+                Semantic HTML tag with corresponding classes
+              </div>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => copyToClipboard(effectiveHtml, 'html')}
+              className="h-8 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 text-xs font-bold gap-1.5 shrink-0 self-start sm:self-center"
+            >
+              {copiedType === 'html' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              {copiedType === 'html' ? 'Copied!' : 'Copy HTML'}
+            </Button>
+          </div>
+        </div>
+
+        {/* Integration Tip */}
+        <div className="p-3.5 rounded-xl bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/30 dark:border-amber-500/20 text-xs text-amber-900 dark:text-amber-200/90 space-y-1">
+          <div className="font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+            💡 Multi-Framework Component Export:
+          </div>
+          <p className="text-[11px] leading-relaxed text-muted-foreground">
+            Switch to the <b>Export</b> tab above to export ready-to-use drop-in components for React (TSX), Vue 3, Svelte 5, or standalone HTML + CSS!
+          </p>
+        </div>
+      </TabsContent>
+
+      {/* TAB: Frameworks & Export */}
+      <TabsContent value="frameworks" className="flex-1 flex flex-col min-h-0 m-0 overflow-hidden">
+        {/* Framework Picker Bar */}
+        <div className="p-2 sm:p-2.5 border-b border-border/50 dark:border-border/30 bg-muted/60 dark:bg-[#121218] flex flex-wrap items-center justify-between gap-2 shrink-0">
+          <div className="flex items-center gap-1 bg-muted/80 dark:bg-white/5 border border-border/80 dark:border-white/10 p-0.5 rounded-lg overflow-x-auto scrollbar-none max-w-full">
+            <button
+              onClick={() => setSelectedFramework('react')}
+              className={`px-2 sm:px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all flex items-center gap-1 shrink-0 ${
+                selectedFramework === 'react'
+                  ? 'bg-sky-500 text-black shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <span>⚛️</span> React TSX
+            </button>
+            <button
+              onClick={() => setSelectedFramework('vue')}
+              className={`px-2 sm:px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all flex items-center gap-1 shrink-0 ${
+                selectedFramework === 'vue'
+                  ? 'bg-emerald-500 text-black shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <span>💚</span> Vue 3
+            </button>
+            <button
+              onClick={() => setSelectedFramework('svelte')}
+              className={`px-2 sm:px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all flex items-center gap-1 shrink-0 ${
+                selectedFramework === 'svelte'
+                  ? 'bg-orange-500 text-black shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <span>🧡</span> Svelte 5
+            </button>
+            <button
+              onClick={() => setSelectedFramework('html')}
+              className={`px-2 sm:px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all flex items-center gap-1 shrink-0 ${
+                selectedFramework === 'html'
+                  ? 'bg-amber-500 text-black shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <span>🌐</span> HTML + CSS
+            </button>
+          </div>
+
+          <Button
+            size="sm"
+            onClick={() => copyToClipboard(currentFrameworkCode, selectedFramework as any)}
+            className="h-7 text-xs font-bold bg-amber-500 hover:bg-amber-400 text-black gap-1.5"
+          >
+            {copiedType === selectedFramework ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+            {copiedType === selectedFramework ? 'Copied Component!' : 'Copy Component'}
+          </Button>
+        </div>
+
+        {/* Framework Code Preview with Syntax Highlighter */}
+        <div className="flex-1 overflow-y-auto p-3 bg-slate-950 font-mono text-xs">
+          <SyntaxHighlighter
+            language={selectedFramework === 'html' ? 'html' : selectedFramework === 'react' ? 'tsx' : 'html'}
+            style={oneDark}
+            customStyle={{
+              margin: 0,
+              padding: '0.75rem',
+              fontSize: '0.75rem',
+              background: 'transparent',
+            }}
+            wrapLongLines
+          >
+            {currentFrameworkCode}
+          </SyntaxHighlighter>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="p-2 sm:p-2.5 border-t border-border/50 dark:border-border/30 bg-muted/40 dark:bg-[#0c0c11] flex items-center justify-between gap-2 shrink-0">
+          <span className="text-[11px] text-muted-foreground flex items-center gap-1 truncate">
+            <Sparkles className="w-3 h-3 text-amber-500 shrink-0" />
+            <span className="truncate">Synchronized with live CSS &amp; HTML edits</span>
+          </span>
+          <Button
+            size="sm"
+            onClick={() => copyToClipboard(currentFrameworkCode, selectedFramework as any)}
+            className="h-7 text-xs font-bold bg-amber-500 hover:bg-amber-400 text-black gap-1.5 shrink-0"
+          >
+            {copiedType === selectedFramework ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+            {copiedType === selectedFramework ? 'Copied!' : 'Copy Code'}
+          </Button>
+        </div>
+      </TabsContent>
+
+      {/* TAB 2: Live Editable CSS */}
+      <TabsContent value="css-editor" className="flex-1 flex flex-col min-h-0 m-0">
+        <div className="flex items-center justify-between px-3 sm:px-4 py-2 border-b border-border/50 dark:border-border/30 bg-muted/60 dark:bg-[#121218]">
+          <div className="text-[11px] text-amber-500 dark:text-amber-400 font-mono flex items-center gap-1.5">
+            <Terminal className="w-3.5 h-3.5" /> Realtime CSS Editor
+          </div>
+          <div className="flex items-center gap-2">
+            {isCustomModified && (
+              <button
+                onClick={handleResetCode}
+                className="text-[10px] text-muted-foreground hover:text-amber-500 flex items-center gap-1"
+              >
+                <RotateCcw className="w-2.5 h-2.5" /> Reset
+              </button>
+            )}
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => copyToClipboard(customCss, 'css')}
+              className="h-6 text-[10px] text-muted-foreground hover:text-foreground px-2"
+            >
+              {copiedType === 'css' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              Copy CSS
+            </Button>
+          </div>
+        </div>
+        <textarea
+          value={customCss}
+          onChange={(e) => {
+            setCustomCss(e.target.value);
+            setIsCustomModified(true);
+          }}
+          spellCheck={false}
+          className="flex-1 w-full bg-slate-950 text-amber-300 dark:text-amber-200/90 p-4 font-mono text-xs leading-relaxed resize-none focus:outline-none border-none overflow-y-auto selection:bg-amber-500/30"
+          placeholder="Type or paste CSS rules here..."
+        />
+      </TabsContent>
+
+      {/* TAB 3: Live Editable HTML */}
+      <TabsContent value="html-editor" className="flex-1 flex flex-col min-h-0 m-0">
+        <div className="flex items-center justify-between px-3 sm:px-4 py-2 border-b border-border/50 dark:border-border/30 bg-muted/60 dark:bg-[#121218]">
+          <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono flex items-center gap-1.5">
+            <Code2 className="w-3.5 h-3.5" /> Realtime HTML Editor
+          </div>
+          <div className="flex items-center gap-2">
+            {isCustomModified && (
+              <button
+                onClick={handleResetCode}
+                className="text-[10px] text-muted-foreground hover:text-emerald-500 flex items-center gap-1"
+              >
+                <RotateCcw className="w-2.5 h-2.5" /> Reset
+              </button>
+            )}
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => copyToClipboard(customHtml, 'html')}
+              className="h-6 text-[10px] text-muted-foreground hover:text-foreground px-2"
+            >
+              {copiedType === 'html' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              Copy HTML
+            </Button>
+          </div>
+        </div>
+        <textarea
+          value={customHtml}
+          onChange={(e) => {
+            setCustomHtml(e.target.value);
+            setIsCustomModified(true);
+          }}
+          spellCheck={false}
+          className="flex-1 w-full bg-slate-950 text-emerald-300 dark:text-emerald-200/90 p-4 font-mono text-xs leading-relaxed resize-none focus:outline-none border-none overflow-y-auto selection:bg-emerald-500/30"
+          placeholder="Type or paste HTML markup here..."
+        />
+      </TabsContent>
+
+      {/* TAB 4: Syntax Highlighted Read-only View */}
+      <TabsContent value="syntax" className="flex-1 flex flex-col min-h-0 m-0 overflow-hidden">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold text-amber-400 font-mono">CSS Stylesheet</span>
+              <button
+                onClick={() => copyToClipboard(effect.cssCode, 'css')}
+                className="text-[10px] text-muted-foreground hover:text-white flex items-center gap-1"
+              >
+                <Copy className="w-3 h-3" /> Copy
+              </button>
+            </div>
+            <div className="rounded-lg overflow-hidden border border-white/10">
+              <SyntaxHighlighter
+                language="css"
+                style={oneDark}
+                customStyle={{
+                  margin: 0,
+                  padding: '0.875rem',
+                  fontSize: '0.75rem',
+                  background: '#08080c',
+                }}
+                wrapLongLines
+              >
+                {effect.cssCode}
+              </SyntaxHighlighter>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold text-emerald-400 font-mono">HTML Structure</span>
+              <button
+                onClick={() => copyToClipboard(effect.htmlCode, 'html')}
+                className="text-[10px] text-muted-foreground hover:text-white flex items-center gap-1"
+              >
+                <Copy className="w-3 h-3" /> Copy
+              </button>
+            </div>
+            <div className="rounded-lg overflow-hidden border border-white/10">
+              <SyntaxHighlighter
+                language="html"
+                style={oneDark}
+                customStyle={{
+                  margin: 0,
+                  padding: '0.875rem',
+                  fontSize: '0.75rem',
+                  background: '#08080c',
+                }}
+                wrapLongLines
+              >
+                {effect.htmlCode}
+              </SyntaxHighlighter>
+            </div>
+          </div>
+        </div>
+      </TabsContent>
+    </>
+  );
+
   return (
     <>
       {/* Dimmed backdrop */}
@@ -760,10 +1223,19 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
         onClick={onClose}
       />
 
-      {/* 8-Direction Resizable Window Container */}
+      {/* Main Studio Container */}
       <div
         style={
-          isMaximized
+          isMobile
+            ? {
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100dvh',
+                zIndex: 50,
+              }
+            : isMaximized
             ? {
                 position: 'fixed',
                 top: 0,
@@ -782,11 +1254,11 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
               }
         }
         className={`group/win flex flex-col bg-background dark:bg-[#0c0c11] border border-border/80 dark:border-white/15 text-foreground shadow-2xl shadow-slate-950/25 dark:shadow-black/95 select-none ${
-          isMaximized ? 'rounded-none' : 'rounded-2xl'
+          isMobile || isMaximized ? 'rounded-none' : 'rounded-2xl'
         } ${isDraggingOrResizing ? 'transition-none' : 'transition-[top,left,width,height] duration-75 ease-out'}`}
       >
-        {/* ==================== 8 RESIZE HANDLES ==================== */}
-        {!isMaximized && (
+        {/* ==================== 8 RESIZE HANDLES (Desktop Only) ==================== */}
+        {!isMaximized && !isMobile && (
           <>
             {/* Top edge */}
             <div
@@ -839,23 +1311,23 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
           </>
         )}
 
-        {/* ==================== WINDOW HEADER (Draggable) ==================== */}
+        {/* ==================== WINDOW HEADER ==================== */}
         <div
-          onPointerDown={handleStartHeaderDrag}
+          onPointerDown={isMobile ? undefined : handleStartHeaderDrag}
           onDoubleClick={toggleMaximize}
-          className={`flex items-center justify-between px-4 sm:px-5 py-2.5 sm:py-3 border-b border-border/60 dark:border-border/40 bg-muted/70 dark:bg-[#121218] shrink-0 gap-3 select-none ${
-            isMaximized ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'
+          className={`flex items-center justify-between px-3 sm:px-5 py-2 sm:py-3 border-b border-border/60 dark:border-border/40 bg-muted/70 dark:bg-[#121218] shrink-0 gap-2 select-none ${
+            isMobile || isMaximized ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'
           }`}
         >
           {/* Left Title */}
-          <div className="flex items-center gap-3 min-w-0 pointer-events-none">
-            <Logo size={32} />
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 pointer-events-none">
+            <Logo size={28} className="shrink-0" />
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h2 className="text-sm sm:text-base font-bold text-foreground truncate tracking-tight">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h2 className="text-xs sm:text-base font-bold text-foreground truncate tracking-tight">
                   {effect.name}
                 </h2>
-                <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full">
+                <span className="shrink-0 text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 sm:px-2 py-0.5 rounded-full">
                   {effect.category}
                 </span>
               </div>
@@ -866,602 +1338,252 @@ function LiveStudioContent({ effect, onClose, onSelectEffect }: LiveStudioConten
           </div>
 
           {/* Right Window Controls */}
-          <div className="flex items-center gap-1.5 shrink-0" onPointerDown={(e) => e.stopPropagation()}>
-            {/* Sequential Navigation (< 1/64 >) */}
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0" onPointerDown={(e) => e.stopPropagation()}>
+            {/* Sequential Navigation (< 1/150 >) */}
             <div className="flex items-center gap-0.5 bg-muted/80 dark:bg-white/5 border border-border/80 dark:border-white/10 rounded-lg p-0.5">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => navigateEffect(-1)}
-                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10"
+                className="h-6 w-6 sm:h-7 sm:w-7 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10"
                 title="Previous Effect (Left Arrow)"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </Button>
-              <span className="text-[11px] font-mono font-medium text-muted-foreground px-1.5 whitespace-nowrap">
+              <span className="text-[10px] sm:text-[11px] font-mono font-medium text-muted-foreground px-1 sm:px-1.5 whitespace-nowrap">
                 {currentIndex + 1} / {allEffects.length}
               </span>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => navigateEffect(1)}
-                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10"
+                className="h-6 w-6 sm:h-7 sm:w-7 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10"
                 title="Next Effect (Right Arrow)"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </Button>
             </div>
 
-            {/* Split Orientation Toggle */}
-            <div className="hidden sm:flex items-center bg-muted/80 dark:bg-white/5 border border-border/80 dark:border-white/10 rounded-lg p-0.5">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSplitDirection(splitDirection === 'horizontal' ? 'vertical' : 'horizontal')}
-                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10"
-                title={splitDirection === 'horizontal' ? 'Switch to Stacked View' : 'Switch to Side-by-Side View'}
-              >
-                {splitDirection === 'horizontal' ? <Columns className="w-3.5 h-3.5" /> : <Rows className="w-3.5 h-3.5" />}
-              </Button>
-            </div>
+            {/* Split Orientation Toggle (Desktop only) */}
+            {!isMobile && (
+              <div className="hidden sm:flex items-center bg-muted/80 dark:bg-white/5 border border-border/80 dark:border-white/10 rounded-lg p-0.5">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSplitDirection(splitDirection === 'horizontal' ? 'vertical' : 'horizontal')}
+                  className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10"
+                  title={splitDirection === 'horizontal' ? 'Switch to Stacked View' : 'Switch to Side-by-Side View'}
+                >
+                  {splitDirection === 'horizontal' ? <Columns className="w-3.5 h-3.5" /> : <Rows className="w-3.5 h-3.5" />}
+                </Button>
+              </div>
+            )}
 
             {/* Favorite Button */}
             <Button
               variant="ghost"
               size="icon"
               onClick={() => toggleFavorite(effect.id)}
-              className="h-8 w-8 hover:bg-muted dark:hover:bg-white/10"
+              className="h-7 w-7 sm:h-8 sm:w-8 hover:bg-muted dark:hover:bg-white/10"
               title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
             >
               <Heart
-                className={`w-4 h-4 transition-colors ${
+                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors ${
                   isFavorite ? 'fill-red-500 text-red-500' : 'text-muted-foreground hover:text-foreground'
                 }`}
               />
             </Button>
 
-            {/* Maximize / Restore Toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleMaximize}
-              className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10"
-              title={isMaximized ? 'Restore Window' : 'Maximize Window'}
-            >
-              {isMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-            </Button>
+            {/* Maximize / Restore Toggle (Desktop only) */}
+            {!isMobile && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleMaximize}
+                className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10"
+                title={isMaximized ? 'Restore Window' : 'Maximize Window'}
+              >
+                {isMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              </Button>
+            )}
 
             {/* Close Studio Button */}
             <Button
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10 ml-0.5"
+              className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/10 ml-0.5"
             >
               <X className="w-4 h-4" />
             </Button>
           </div>
         </div>
 
-        {/* ==================== RESIZABLE SPLIT PANELS ==================== */}
-        <div className="flex-1 min-h-0 overflow-hidden relative">
-          {/* Resizing overlay to block iframe pointer trap */}
-          {isDraggingOrResizing && <div className="absolute inset-0 z-50 bg-transparent cursor-grabbing" />}
-
-          <ResizablePanelGroup
-            direction={splitDirection}
-            className="h-full w-full rounded-none"
-          >
-            {/* Panel 1: Live Interactive Canvas */}
-            <ResizablePanel defaultSize={58} minSize={25} className="flex flex-col min-h-0 bg-muted/20 dark:bg-[#0a0a0e]">
-              {/* Toolbar Row 1: Themes + Zoom + Speed + Replay */}
-              <div className="flex items-center justify-between px-3 sm:px-4 py-2 bg-muted/50 dark:bg-[#121218] border-b border-border/50 dark:border-border/30 gap-2 overflow-x-auto scrollbar-none shrink-0">
-                {/* Canvas Theme Selector */}
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <span className="text-[11px] text-muted-foreground font-medium flex items-center gap-1">
-                    <Layers className="w-3.5 h-3.5 text-amber-500" /> Canvas:
-                  </span>
-                  <div className="flex items-center gap-0.5 bg-muted/80 dark:bg-black/50 p-0.5 rounded-lg border border-border/80 dark:border-white/10">
-                    {(['dark', 'black', 'light', 'grid', 'dots', 'gradient'] as BackgroundTheme[]).map((bg) => (
-                      <button
-                        key={bg}
-                        onClick={() => setBgTheme(bg)}
-                        className={`px-2 py-0.5 rounded text-[10px] font-medium capitalize transition-all ${
-                          bgTheme === bg
-                            ? 'bg-amber-500 text-black font-semibold shadow-xs'
-                            : 'text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        {bg}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Transformations: Zoom + Speed + Replay */}
-                <div className="flex items-center gap-2 shrink-0">
-                  <div className="flex items-center gap-1 bg-muted/80 dark:bg-black/50 p-0.5 rounded-lg border border-border/80 dark:border-white/10 text-[10px]">
-                    <span className="text-muted-foreground pl-1.5 pr-0.5 hidden xs:inline">Zoom:</span>
-                    {[0.75, 1, 1.25, 1.5].map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => setScale(s)}
-                        className={`px-1.5 py-0.5 rounded transition-all ${
-                          scale === s ? 'bg-background dark:bg-white/20 text-foreground dark:text-white font-semibold shadow-xs' : 'text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        {s}x
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center gap-1 bg-muted/80 dark:bg-black/50 p-0.5 rounded-lg border border-border/80 dark:border-white/10 text-[10px]">
-                    <span className="text-muted-foreground pl-1.5 pr-0.5 hidden xs:inline">Speed:</span>
-                    {[0.5, 1, 2].map((sp) => (
-                      <button
-                        key={sp}
-                        onClick={() => setSpeedMultiplier(sp)}
-                        className={`px-1.5 py-0.5 rounded transition-all ${
-                          speedMultiplier === sp ? 'bg-background dark:bg-white/20 text-foreground dark:text-white font-semibold shadow-xs' : 'text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        {sp}x
-                      </button>
-                    ))}
-                  </div>
-
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleReplay}
-                    className="h-7 w-7 text-muted-foreground hover:text-amber-500 hover:bg-muted dark:hover:bg-white/5"
-                    title="Replay Animation"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* Toolbar Row 2: Color Palette + Hover Simulator */}
-              <div className="flex items-center justify-between px-3 sm:px-4 py-1.5 bg-muted/30 dark:bg-[#0f0f15] border-b border-border/40 dark:border-border/20 text-[11px] gap-2 overflow-x-auto scrollbar-none shrink-0">
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-muted-foreground flex items-center gap-1 font-medium text-[11px]">
-                    <Palette className="w-3.5 h-3.5 text-amber-500" /> Accent Tint:
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    {PRESET_COLORS.map((c) => (
-                      <button
-                        key={c.name}
-                        onClick={() => setSelectedColor(c.hex)}
-                        className={`w-4 h-4 rounded-full border transition-all ${
-                          selectedColor === c.hex
-                            ? 'scale-125 border-foreground dark:border-white shadow-xs ring-1 ring-foreground/40 dark:ring-white/50'
-                            : 'border-transparent opacity-65 hover:opacity-100 hover:scale-110'
-                        }`}
-                        style={{ backgroundColor: c.hex }}
-                        title={c.name}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    onClick={() => setIsHoverSimulated(!isHoverSimulated)}
-                    className={`px-2.5 py-1 rounded-lg border text-[11px] font-medium transition-all flex items-center gap-1.5 ${
-                      isHoverSimulated
-                        ? 'bg-amber-500/20 border-amber-500/60 text-amber-600 dark:text-amber-400 shadow-xs'
-                        : 'border-border/80 dark:border-white/10 text-muted-foreground hover:text-foreground hover:bg-muted dark:hover:bg-white/5'
-                    }`}
-                  >
-                    <Sparkles className="w-3 h-3" />
-                    <span>{isHoverSimulated ? 'Hover Locked' : 'Simulate Hover'}</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Live Interactive Canvas Body */}
-              <div
-                id="live-studio-canvas-root"
-                key={`canvas-${renderKey}-${effect.id}`}
-                onClick={handleSandboxClick}
-                onMouseMove={handleSandboxMouseMove}
-                onInput={handleSandboxInput}
-                onKeyDown={handleSandboxKeyDown}
-                className={`relative flex-1 flex items-center justify-center p-6 sm:p-10 overflow-auto transition-colors duration-300 min-h-[220px] ${getCanvasBgClass()}`}
-              >
-                {/* Injected Scoped Styles */}
-                <style dangerouslySetInnerHTML={{ __html: previewScopedCss }} />
-
-                {/* Scaling Container */}
-                <div
-                  style={{
-                    transform: `scale(${scale})`,
-                    transformOrigin: 'center center',
-                    transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                  }}
-                  className={`relative flex items-center justify-center w-full max-w-[620px] ${
-                    isHoverSimulated ? 'force-hover-mode' : ''
+        {/* ==================== CONTENT BODY ==================== */}
+        {isMobile ? (
+          /* Mobile Adaptive Layout: Segmented Full-Screen Navigation */
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            {/* Mobile Segmented Navigation Tabs */}
+            <div className="p-1.5 border-b border-border/50 dark:border-border/30 bg-muted/60 dark:bg-[#121218] shrink-0">
+              <div className="flex items-center gap-1 overflow-x-auto scrollbar-none p-0.5 bg-muted/80 dark:bg-white/5 rounded-lg border border-border/80 dark:border-white/10">
+                <button
+                  onClick={() => setMobileTab('canvas')}
+                  className={`flex-1 min-w-[68px] text-[10px] py-1.5 px-2 rounded-md font-semibold flex items-center justify-center gap-1 transition-all ${
+                    mobileTab === 'canvas'
+                      ? 'bg-amber-500 text-black shadow-xs'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  <div
-                    className="live-interactive-sandbox-render w-full flex items-center justify-center"
-                    dangerouslySetInnerHTML={{ __html: customHtml }}
-                  />
-                </div>
-
-                {/* Bottom Sandbox Live Badge */}
-                <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-background/80 dark:bg-black/60 backdrop-blur-md border border-border/80 dark:border-white/10 text-[10px] text-foreground/80 dark:text-muted-foreground pointer-events-none">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>Live Sandbox &middot; click / hover to test</span>
-                </div>
+                  <Monitor className="w-3 h-3 shrink-0" />
+                  <span>Canvas</span>
+                </button>
+                <button
+                  onClick={() => setMobileTab('overview')}
+                  className={`flex-1 min-w-[68px] text-[10px] py-1.5 px-2 rounded-md font-semibold flex items-center justify-center gap-1 transition-all ${
+                    mobileTab === 'overview'
+                      ? 'bg-amber-500 text-black shadow-xs'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Sliders className="w-3 h-3 shrink-0" />
+                  <span>Details</span>
+                </button>
+                <button
+                  onClick={() => setMobileTab('frameworks')}
+                  className={`flex-1 min-w-[68px] text-[10px] py-1.5 px-2 rounded-md font-semibold flex items-center justify-center gap-1 transition-all ${
+                    mobileTab === 'frameworks'
+                      ? 'bg-sky-500 text-black shadow-xs'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Package className="w-3 h-3 shrink-0" />
+                  <span>Export</span>
+                </button>
+                <button
+                  onClick={() => setMobileTab('css-editor')}
+                  className={`flex-1 min-w-[68px] text-[10px] py-1.5 px-2 rounded-md font-semibold flex items-center justify-center gap-1 transition-all ${
+                    mobileTab === 'css-editor'
+                      ? 'bg-amber-500 text-black shadow-xs'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Terminal className="w-3 h-3 shrink-0" />
+                  <span>Live CSS</span>
+                </button>
+                <button
+                  onClick={() => setMobileTab('html-editor')}
+                  className={`flex-1 min-w-[68px] text-[10px] py-1.5 px-2 rounded-md font-semibold flex items-center justify-center gap-1 transition-all ${
+                    mobileTab === 'html-editor'
+                      ? 'bg-emerald-500 text-black shadow-xs'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Code2 className="w-3 h-3 shrink-0" />
+                  <span>Live HTML</span>
+                </button>
+                <button
+                  onClick={() => setMobileTab('syntax')}
+                  className={`flex-1 min-w-[68px] text-[10px] py-1.5 px-2 rounded-md font-semibold flex items-center justify-center gap-1 transition-all ${
+                    mobileTab === 'syntax'
+                      ? 'bg-foreground/15 dark:bg-white/20 text-foreground dark:text-white shadow-xs'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Eye className="w-3 h-3 shrink-0" />
+                  <span>Code</span>
+                </button>
               </div>
-            </ResizablePanel>
+            </div>
 
-            {/* Draggable Divider Handle */}
-            <ResizableHandle
-              withHandle
-              className="bg-border/60 hover:bg-amber-500/60 transition-colors z-20"
-            />
+            {/* Mobile View Container */}
+            <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+              {mobileTab === 'canvas' ? (
+                renderCanvasView(true)
+              ) : (
+                <Tabs
+                  value={mobileTab as any}
+                  onValueChange={(v) => setMobileTab(v as MobileTab)}
+                  className="flex flex-col h-full min-h-0"
+                >
+                  {renderTabContent()}
+                </Tabs>
+              )}
+            </div>
+          </div>
+        ) : (
+          /* Desktop Layout: Draggable Resizable Split Pane Group */
+          <div className="flex-1 min-h-0 overflow-hidden relative">
+            {isDraggingOrResizing && <div className="absolute inset-0 z-50 bg-transparent cursor-grabbing" />}
 
-            {/* Panel 2: Multi-tab Inspector & Realtime Code Editor */}
-            <ResizablePanel defaultSize={42} minSize={25} className="flex flex-col bg-card dark:bg-[#0c0c11] min-h-0 overflow-hidden">
-              <Tabs
-                value={activeTab}
-                onValueChange={(v) => setActiveTab(v as any)}
-                className="flex flex-col h-full min-h-0"
-              >
-                {/* Tabs Header with Responsive Flow */}
-                <div className="p-2 border-b border-border/50 dark:border-border/30 bg-muted/50 dark:bg-[#121218] shrink-0">
-                  <TabsList className="flex items-center justify-between w-full bg-muted/80 dark:bg-white/5 border border-border/80 dark:border-white/10 h-8 p-0.5 rounded-lg overflow-x-auto scrollbar-none gap-0.5">
-                    <TabsTrigger
-                      value="overview"
-                      className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-amber-500 data-[state=active]:text-black text-muted-foreground font-semibold flex items-center justify-center gap-1 min-w-[70px]"
-                    >
-                      <Sliders className="w-3 h-3 shrink-0" />
-                      <span className="truncate">Overview</span>
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="frameworks"
-                      className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-sky-500 data-[state=active]:text-black text-muted-foreground font-semibold flex items-center justify-center gap-1 min-w-[80px]"
-                    >
-                      <Package className="w-3 h-3 shrink-0" />
-                      <span className="truncate">Export</span>
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="css-editor"
-                      className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-amber-500 data-[state=active]:text-black text-muted-foreground font-semibold flex items-center justify-center gap-1 min-w-[70px]"
-                    >
-                      <Terminal className="w-3 h-3 shrink-0" />
-                      <span className="truncate">Live CSS</span>
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="html-editor"
-                      className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-emerald-500 data-[state=active]:text-black text-muted-foreground font-semibold flex items-center justify-center gap-1 min-w-[70px]"
-                    >
-                      <Code2 className="w-3 h-3 shrink-0" />
-                      <span className="truncate">Live HTML</span>
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="syntax"
-                      className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-foreground/15 dark:data-[state=active]:bg-white/20 data-[state=active]:text-foreground dark:data-[state=active]:text-white text-muted-foreground font-semibold flex items-center justify-center gap-1 min-w-[70px]"
-                    >
-                      <Eye className="w-3 h-3 shrink-0" />
-                      <span className="truncate">Full Code</span>
-                    </TabsTrigger>
-                  </TabsList>
-                </div>
+            <ResizablePanelGroup
+              direction={splitDirection}
+              className="h-full w-full rounded-none"
+            >
+              {/* Panel 1: Live Interactive Canvas */}
+              <ResizablePanel defaultSize={58} minSize={25} className="flex flex-col min-h-0">
+                {renderCanvasView(false)}
+              </ResizablePanel>
 
-                {/* TAB 1: Overview & 1-Click Code Actions */}
-                <TabsContent value="overview" className="flex-1 flex flex-col p-4 space-y-3.5 overflow-y-auto m-0 min-h-0">
-                  {/* Metadata Box */}
-                  <div className="p-3.5 rounded-xl bg-muted/30 dark:bg-white/[0.03] border border-border/80 dark:border-white/10 space-y-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Effect Details
-                      </h4>
-                      {isCustomModified && (
-                        <button
-                          onClick={handleResetCode}
-                          className="text-[10px] text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-300 flex items-center gap-1 font-medium bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20"
-                        >
-                          <RotateCcw className="w-2.5 h-2.5" /> Reset Code
-                        </button>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {effect.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2 pt-1 text-[11px]">
-                      <span className="px-2.5 py-0.5 rounded-md bg-muted/70 dark:bg-white/5 border border-border/80 dark:border-white/10 text-muted-foreground">
-                        Category: <b className="text-amber-500 dark:text-amber-400 capitalize">{effect.category}</b>
-                      </span>
-                      <span className="px-2.5 py-0.5 rounded-md bg-muted/70 dark:bg-white/5 border border-border/80 dark:border-white/10 text-muted-foreground">
-                        ID: <code className="text-emerald-600 dark:text-emerald-400 font-mono">{effect.id}</code>
-                      </span>
-                    </div>
-                  </div>
+              {/* Draggable Divider Handle */}
+              <ResizableHandle
+                withHandle
+                className="bg-border/60 hover:bg-amber-500/60 transition-colors z-20"
+              />
 
-                  {/* 1-Click Code Copy Cards */}
-                  <div className="space-y-2.5">
-                    {/* CSS Card */}
-                    <div className="p-3.5 rounded-xl bg-muted/30 dark:bg-white/[0.03] border border-border/80 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                      <div className="min-w-0">
-                        <div className="text-xs font-bold text-amber-500 dark:text-amber-400">CSS Stylesheet Rules</div>
-                        <div className="text-[11px] text-muted-foreground mt-0.5">
-                          Pure CSS class definition & keyframe animations
-                        </div>
-                      </div>
-                      <Button
-                        size="sm"
-                        onClick={() => copyToClipboard(effectiveCss, 'css')}
-                        className="h-8 bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs gap-1.5 shrink-0 self-start sm:self-center"
+              {/* Panel 2: Multi-tab Inspector & Realtime Code Editor */}
+              <ResizablePanel defaultSize={42} minSize={25} className="flex flex-col bg-card dark:bg-[#0c0c11] min-h-0 overflow-hidden">
+                <Tabs
+                  value={activeTab}
+                  onValueChange={(v) => setActiveTab(v as any)}
+                  className="flex flex-col h-full min-h-0"
+                >
+                  {/* Tabs Header */}
+                  <div className="p-2 border-b border-border/50 dark:border-border/30 bg-muted/50 dark:bg-[#121218] shrink-0">
+                    <TabsList className="flex items-center justify-between w-full bg-muted/80 dark:bg-white/5 border border-border/80 dark:border-white/10 h-8 p-0.5 rounded-lg overflow-x-auto scrollbar-none gap-0.5">
+                      <TabsTrigger
+                        value="overview"
+                        className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-amber-500 data-[state=active]:text-black text-muted-foreground font-semibold flex items-center justify-center gap-1 min-w-[70px]"
                       >
-                        {copiedType === 'css' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                        {copiedType === 'css' ? 'Copied!' : 'Copy CSS'}
-                      </Button>
-                    </div>
-
-                    {/* HTML Card */}
-                    <div className="p-3.5 rounded-xl bg-muted/30 dark:bg-white/[0.03] border border-border/80 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                      <div className="min-w-0">
-                        <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400">HTML Element Markup</div>
-                        <div className="text-[11px] text-muted-foreground mt-0.5">
-                          Semantic HTML tag with corresponding classes
-                        </div>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => copyToClipboard(effectiveHtml, 'html')}
-                        className="h-8 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 text-xs font-bold gap-1.5 shrink-0 self-start sm:self-center"
+                        <Sliders className="w-3 h-3 shrink-0" />
+                        <span className="truncate">Overview</span>
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="frameworks"
+                        className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-sky-500 data-[state=active]:text-black text-muted-foreground font-semibold flex items-center justify-center gap-1 min-w-[80px]"
                       >
-                        {copiedType === 'html' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                        {copiedType === 'html' ? 'Copied!' : 'Copy HTML'}
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Integration Tip */}
-                  <div className="p-3.5 rounded-xl bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/30 dark:border-amber-500/20 text-xs text-amber-900 dark:text-amber-200/90 space-y-1">
-                    <div className="font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                      💡 Multi-Framework Component Export:
-                    </div>
-                    <p className="text-[11px] leading-relaxed text-muted-foreground">
-                      Switch to the <b>Export</b> tab above to export ready-to-use drop-in components for React (TSX), Vue 3, Svelte 5, or standalone HTML + CSS!
-                    </p>
-                  </div>
-                </TabsContent>
-
-                {/* TAB: Frameworks & Export */}
-                <TabsContent value="frameworks" className="flex-1 flex flex-col min-h-0 m-0 overflow-hidden">
-                  {/* Framework Picker Bar */}
-                  <div className="p-2.5 border-b border-border/50 dark:border-border/30 bg-muted/60 dark:bg-[#121218] flex flex-wrap items-center justify-between gap-2 shrink-0">
-                    <div className="flex items-center gap-1 bg-muted/80 dark:bg-white/5 border border-border/80 dark:border-white/10 p-0.5 rounded-lg">
-                      <button
-                        onClick={() => setSelectedFramework('react')}
-                        className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all flex items-center gap-1.5 ${
-                          selectedFramework === 'react'
-                            ? 'bg-sky-500 text-black shadow-sm'
-                            : 'text-muted-foreground hover:text-foreground'
-                        }`}
+                        <Package className="w-3 h-3 shrink-0" />
+                        <span className="truncate">Export</span>
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="css-editor"
+                        className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-amber-500 data-[state=active]:text-black text-muted-foreground font-semibold flex items-center justify-center gap-1 min-w-[70px]"
                       >
-                        <span>⚛️</span> React TSX
-                      </button>
-                      <button
-                        onClick={() => setSelectedFramework('vue')}
-                        className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all flex items-center gap-1.5 ${
-                          selectedFramework === 'vue'
-                            ? 'bg-emerald-500 text-black shadow-sm'
-                            : 'text-muted-foreground hover:text-foreground'
-                        }`}
+                        <Terminal className="w-3 h-3 shrink-0" />
+                        <span className="truncate">Live CSS</span>
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="html-editor"
+                        className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-emerald-500 data-[state=active]:text-black text-muted-foreground font-semibold flex items-center justify-center gap-1 min-w-[70px]"
                       >
-                        <span>💚</span> Vue 3
-                      </button>
-                      <button
-                        onClick={() => setSelectedFramework('svelte')}
-                        className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all flex items-center gap-1.5 ${
-                          selectedFramework === 'svelte'
-                            ? 'bg-orange-500 text-black shadow-sm'
-                            : 'text-muted-foreground hover:text-foreground'
-                        }`}
+                        <Code2 className="w-3 h-3 shrink-0" />
+                        <span className="truncate">Live HTML</span>
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="syntax"
+                        className="flex-1 text-[11px] h-7 px-2 data-[state=active]:bg-foreground/15 dark:data-[state=active]:bg-white/20 data-[state=active]:text-foreground dark:data-[state=active]:text-white text-muted-foreground font-semibold flex items-center justify-center gap-1 min-w-[70px]"
                       >
-                        <span>🧡</span> Svelte 5
-                      </button>
-                      <button
-                        onClick={() => setSelectedFramework('html')}
-                        className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all flex items-center gap-1.5 ${
-                          selectedFramework === 'html'
-                            ? 'bg-amber-500 text-black shadow-sm'
-                            : 'text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        <span>🌐</span> HTML + CSS
-                      </button>
-                    </div>
-
-                    <Button
-                      size="sm"
-                      onClick={() => copyToClipboard(currentFrameworkCode, selectedFramework as any)}
-                      className="h-7 text-xs font-bold bg-amber-500 hover:bg-amber-400 text-black gap-1.5"
-                    >
-                      {copiedType === selectedFramework ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                      {copiedType === selectedFramework ? 'Copied Component!' : 'Copy Component'}
-                    </Button>
+                        <Eye className="w-3 h-3 shrink-0" />
+                        <span className="truncate">Full Code</span>
+                      </TabsTrigger>
+                    </TabsList>
                   </div>
 
-                  {/* Framework Code Preview with Syntax Highlighter */}
-                  <div className="flex-1 overflow-y-auto p-3 bg-slate-950 font-mono text-xs">
-                    <SyntaxHighlighter
-                      language={selectedFramework === 'html' ? 'html' : selectedFramework === 'react' ? 'tsx' : 'html'}
-                      style={oneDark}
-                      customStyle={{
-                        margin: 0,
-                        padding: '0.75rem',
-                        fontSize: '0.75rem',
-                        background: 'transparent',
-                      }}
-                      wrapLongLines
-                    >
-                      {currentFrameworkCode}
-                    </SyntaxHighlighter>
-                  </div>
-
-                  {/* Bottom Bar */}
-                  <div className="p-2.5 border-t border-border/50 dark:border-border/30 bg-muted/40 dark:bg-[#0c0c11] flex items-center justify-between gap-2 shrink-0">
-                    <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                      <Sparkles className="w-3 h-3 text-amber-500" />
-                      <span>Synchronized in real-time with your live CSS and HTML edits</span>
-                    </span>
-                    <Button
-                      size="sm"
-                      onClick={() => copyToClipboard(currentFrameworkCode, selectedFramework as any)}
-                      className="h-7 text-xs font-bold bg-amber-500 hover:bg-amber-400 text-black gap-1.5"
-                    >
-                      {copiedType === selectedFramework ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                      {copiedType === selectedFramework ? 'Copied!' : 'Copy Code'}
-                    </Button>
-                  </div>
-                </TabsContent>
-
-                {/* TAB 2: Live Editable CSS */}
-                <TabsContent value="css-editor" className="flex-1 flex flex-col min-h-0 m-0">
-                  <div className="flex items-center justify-between px-4 py-2 border-b border-border/50 dark:border-border/30 bg-muted/60 dark:bg-[#121218]">
-                    <div className="text-[11px] text-amber-500 dark:text-amber-400 font-mono flex items-center gap-1.5">
-                      <Terminal className="w-3.5 h-3.5" /> Realtime CSS Editor
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {isCustomModified && (
-                        <button
-                          onClick={handleResetCode}
-                          className="text-[10px] text-muted-foreground hover:text-amber-500 flex items-center gap-1"
-                        >
-                          <RotateCcw className="w-2.5 h-2.5" /> Reset
-                        </button>
-                      )}
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => copyToClipboard(customCss, 'css')}
-                        className="h-6 text-[10px] text-muted-foreground hover:text-foreground px-2"
-                      >
-                        {copiedType === 'css' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                        Copy CSS
-                      </Button>
-                    </div>
-                  </div>
-                  <textarea
-                    value={customCss}
-                    onChange={(e) => {
-                      setCustomCss(e.target.value);
-                      setIsCustomModified(true);
-                    }}
-                    spellCheck={false}
-                    className="flex-1 w-full bg-slate-950 text-amber-300 dark:text-amber-200/90 p-4 font-mono text-xs leading-relaxed resize-none focus:outline-none border-none overflow-y-auto selection:bg-amber-500/30"
-                    placeholder="Type or paste CSS rules here..."
-                  />
-                </TabsContent>
-
-                {/* TAB 3: Live Editable HTML */}
-                <TabsContent value="html-editor" className="flex-1 flex flex-col min-h-0 m-0">
-                  <div className="flex items-center justify-between px-4 py-2 border-b border-border/50 dark:border-border/30 bg-muted/60 dark:bg-[#121218]">
-                    <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono flex items-center gap-1.5">
-                      <Code2 className="w-3.5 h-3.5" /> Realtime HTML Editor
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {isCustomModified && (
-                        <button
-                          onClick={handleResetCode}
-                          className="text-[10px] text-muted-foreground hover:text-emerald-500 flex items-center gap-1"
-                        >
-                          <RotateCcw className="w-2.5 h-2.5" /> Reset
-                        </button>
-                      )}
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => copyToClipboard(customHtml, 'html')}
-                        className="h-6 text-[10px] text-muted-foreground hover:text-foreground px-2"
-                      >
-                        {copiedType === 'html' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                        Copy HTML
-                      </Button>
-                    </div>
-                  </div>
-                  <textarea
-                    value={customHtml}
-                    onChange={(e) => {
-                      setCustomHtml(e.target.value);
-                      setIsCustomModified(true);
-                    }}
-                    spellCheck={false}
-                    className="flex-1 w-full bg-slate-950 text-emerald-300 dark:text-emerald-200/90 p-4 font-mono text-xs leading-relaxed resize-none focus:outline-none border-none overflow-y-auto selection:bg-emerald-500/30"
-                    placeholder="Type or paste HTML markup here..."
-                  />
-                </TabsContent>
-
-                {/* TAB 4: Syntax Highlighted Read-only View */}
-                <TabsContent value="syntax" className="flex-1 flex flex-col min-h-0 m-0 overflow-hidden">
-                  <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold text-amber-400 font-mono">CSS Stylesheet</span>
-                        <button
-                          onClick={() => copyToClipboard(effect.cssCode, 'css')}
-                          className="text-[10px] text-muted-foreground hover:text-white flex items-center gap-1"
-                        >
-                          <Copy className="w-3 h-3" /> Copy
-                        </button>
-                      </div>
-                      <div className="rounded-lg overflow-hidden border border-white/10">
-                        <SyntaxHighlighter
-                          language="css"
-                          style={oneDark}
-                          customStyle={{
-                            margin: 0,
-                            padding: '0.875rem',
-                            fontSize: '0.75rem',
-                            background: '#08080c',
-                          }}
-                          wrapLongLines
-                        >
-                          {effect.cssCode}
-                        </SyntaxHighlighter>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold text-emerald-400 font-mono">HTML Structure</span>
-                        <button
-                          onClick={() => copyToClipboard(effect.htmlCode, 'html')}
-                          className="text-[10px] text-muted-foreground hover:text-white flex items-center gap-1"
-                        >
-                          <Copy className="w-3 h-3" /> Copy
-                        </button>
-                      </div>
-                      <div className="rounded-lg overflow-hidden border border-white/10">
-                        <SyntaxHighlighter
-                          language="html"
-                          style={oneDark}
-                          customStyle={{
-                            margin: 0,
-                            padding: '0.875rem',
-                            fontSize: '0.75rem',
-                            background: '#08080c',
-                          }}
-                          wrapLongLines
-                        >
-                          {effect.htmlCode}
-                        </SyntaxHighlighter>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </ResizablePanel>
-          </ResizablePanelGroup>
-        </div>
+                  {renderTabContent()}
+                </Tabs>
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </div>
+        )}
       </div>
     </>
   );

@@ -100,6 +100,10 @@ export function EffectsShowcase() {
     document.getElementById('effects-grid')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleRandomEffect = useCallback(() => {
     const pool =
       activeCategory === 'all'
@@ -154,7 +158,11 @@ export function EffectsShowcase() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
-            <div className="flex items-center gap-2.5">
+            <button
+              onClick={scrollToTop}
+              className="flex items-center gap-2.5 hover:opacity-85 transition-opacity cursor-pointer text-left focus:outline-none"
+              title="Scroll to top"
+            >
               <Logo size={32} />
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-base tracking-tight text-foreground">CSSHUB</span>
@@ -162,7 +170,8 @@ export function EffectsShowcase() {
                   Live Studio
                 </span>
               </div>
-            </div>
+            </button>
+
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -207,33 +216,33 @@ export function EffectsShowcase() {
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="space-y-6"
+              className="space-y-5 sm:space-y-6"
             >
               {/* Radiant Headline with Logo */}
               <div className="relative">
-                <div className="flex justify-center mb-5">
-                  <Logo size={68} className="drop-shadow-[0_12px_32px_rgba(0,166,255,0.45)]" />
+                <div className="flex justify-center mb-4 sm:mb-5">
+                  <Logo size={60} className="sm:w-[68px] sm:h-[68px] drop-shadow-[0_12px_32px_rgba(0,166,255,0.45)]" />
                 </div>
-                <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-none select-none">
+                <h1 className="text-4xl xs:text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-none select-none">
                   <span className="bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 bg-clip-text text-transparent drop-shadow-[0_0_45px_rgba(245,158,11,0.45)]">
                     CSSHUB
                   </span>
                 </h1>
-                <div className="text-sm sm:text-base font-mono uppercase tracking-[0.25em] text-muted-foreground/80 mt-2 font-medium">
+                <div className="text-xs sm:text-base font-mono uppercase tracking-[0.2em] sm:tracking-[0.25em] text-muted-foreground/80 mt-2 font-medium">
                   The Ultimate Interactive CSS &amp; UI Lab
                 </div>
               </div>
 
               {/* Subtitle */}
-              <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed px-2">
                 Click on any component to launch the <b>Live Interactive Studio</b>. Tweak colors, speeds, zoom scales, live-edit CSS &amp; HTML in real-time, and copy production-ready snippets.
               </p>
 
               {/* Action Buttons */}
-              <div className="pt-2 flex flex-wrap items-center justify-center gap-3.5">
+              <div className="pt-2 flex flex-col xs:flex-row items-center justify-center gap-3 max-w-xs xs:max-w-none mx-auto">
                 <Button
                   onClick={() => setStudioEffect(allEffects[0])}
-                  className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 bg-[length:200%_auto] hover:bg-[position:right_center] transition-all duration-300 text-black font-extrabold px-7 h-11 sm:h-12 rounded-xl shadow-[0_0_25px_rgba(245,158,11,0.35)] hover:shadow-[0_0_35px_rgba(245,158,11,0.55)] hover:scale-105 active:scale-95 gap-2.5"
+                  className="w-full xs:w-auto bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 bg-[length:200%_auto] hover:bg-[position:right_center] transition-all duration-300 text-black font-extrabold px-6 sm:px-7 h-11 sm:h-12 rounded-xl shadow-[0_0_25px_rgba(245,158,11,0.35)] hover:shadow-[0_0_35px_rgba(245,158,11,0.55)] hover:scale-105 active:scale-95 gap-2"
                 >
                   <Zap className="w-4 h-4 fill-black" />
                   <span>Launch Live Studio</span>
@@ -242,7 +251,7 @@ export function EffectsShowcase() {
                 <Button
                   variant="outline"
                   onClick={handleRandomEffect}
-                  className="h-11 sm:h-12 px-6 rounded-xl border border-border/80 bg-background/50 hover:bg-background/90 hover:border-amber-500/40 text-foreground font-semibold backdrop-blur-md shadow-sm gap-2 hover:scale-105 active:scale-95 transition-all"
+                  className="w-full xs:w-auto h-11 sm:h-12 px-6 rounded-xl border border-border/80 bg-background/50 hover:bg-background/90 hover:border-amber-500/40 text-foreground font-semibold backdrop-blur-md shadow-sm gap-2 hover:scale-105 active:scale-95 transition-all"
                 >
                   <Shuffle className="w-4 h-4 text-amber-500" />
                   <span>Random Effect</span>
@@ -250,31 +259,31 @@ export function EffectsShowcase() {
               </div>
 
               {/* Sleek Feature Highlights Pills */}
-              <div className="pt-4 flex flex-wrap items-center justify-center gap-2.5 max-w-3xl mx-auto">
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-xs text-muted-foreground backdrop-blur-sm shadow-sm hover:border-amber-500/30 transition-colors">
+              <div className="pt-3 sm:pt-4 flex flex-wrap items-center justify-center gap-2 max-w-3xl mx-auto px-2">
+                <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[11px] sm:text-xs text-muted-foreground backdrop-blur-sm shadow-sm hover:border-amber-500/30 transition-colors">
                   <Flame className="w-3.5 h-3.5 text-amber-400" />
                   <span>64+ Effects</span>
                 </div>
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-xs text-muted-foreground backdrop-blur-sm shadow-sm hover:border-amber-500/30 transition-colors">
+                <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[11px] sm:text-xs text-muted-foreground backdrop-blur-sm shadow-sm hover:border-amber-500/30 transition-colors">
                   <Layers className="w-3.5 h-3.5 text-orange-400" />
                   <span>10 Categories</span>
                 </div>
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-xs text-muted-foreground backdrop-blur-sm shadow-sm hover:border-amber-500/30 transition-colors">
+                <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[11px] sm:text-xs text-muted-foreground backdrop-blur-sm shadow-sm hover:border-amber-500/30 transition-colors">
                   <Maximize2 className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>8-Way Resizable Window</span>
+                  <span>Live Studio Sandbox</span>
                 </div>
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-xs text-muted-foreground backdrop-blur-sm shadow-sm hover:border-amber-500/30 transition-colors">
+                <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[11px] sm:text-xs text-muted-foreground backdrop-blur-sm shadow-sm hover:border-amber-500/30 transition-colors">
                   <Code2 className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Live Realtime Editors</span>
+                  <span>Live Code Editors</span>
                 </div>
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-xs text-muted-foreground backdrop-blur-sm shadow-sm hover:border-amber-500/30 transition-colors">
+                <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[11px] sm:text-xs text-muted-foreground backdrop-blur-sm shadow-sm hover:border-amber-500/30 transition-colors">
                   <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
                   <span>Pure CSS &bull; Zero Deps</span>
                 </div>
               </div>
 
               {/* Scroll down trigger */}
-              <div className="pt-6">
+              <div className="pt-4 sm:pt-6">
                 <button
                   onClick={scrollToEffects}
                   className="inline-flex flex-col items-center gap-1.5 text-muted-foreground hover:text-amber-400 transition-colors group cursor-pointer"
@@ -291,8 +300,8 @@ export function EffectsShowcase() {
 
         {/* Search, Categories & Grid Section */}
         <section id="effects-grid" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-          <div className="sticky top-14 z-30 bg-background/80 backdrop-blur-xl py-4 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 border-b border-border/30">
-            <div className="flex items-center gap-3 max-w-md mx-auto mb-4">
+          <div className="sticky top-14 z-30 bg-background/80 backdrop-blur-xl py-3 sm:py-4 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 border-b border-border/30">
+            <div className="flex items-center gap-2 sm:gap-3 max-w-lg mx-auto mb-3 sm:mb-4">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -300,7 +309,7 @@ export function EffectsShowcase() {
                   placeholder="Search effects or categories..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 h-10 bg-muted/50 border-border/50 focus-visible:ring-amber-500/30 rounded-xl"
+                  className="pl-9 sm:pl-10 h-9 sm:h-10 text-xs sm:text-sm bg-muted/50 border-border/50 focus-visible:ring-amber-500/30 rounded-xl"
                 />
               </div>
               <FeatureBar
@@ -342,7 +351,7 @@ export function EffectsShowcase() {
                   const cnt = getCount(cat.id);
                   const fav = cat.id === 'favorites';
                   let cls =
-                    'shrink-0 flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all duration-200 ';
+                    'shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-medium transition-all duration-200 ';
                   if (active) cls += 'bg-amber-500 text-black shadow-lg shadow-amber-500/25 font-bold scale-[1.02]';
                   else if (fav) cls += 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20';
                   else cls += 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground border border-border/50';
@@ -399,8 +408,8 @@ export function EffectsShowcase() {
           </div>
 
           {/* Results info */}
-          <div className="mt-6 mb-4 flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
+          <div className="mt-4 sm:mt-6 mb-3 sm:mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Showing <span className="font-semibold text-foreground">{filteredEffects.length}</span>{' '}
               {filteredEffects.length === 1 ? 'effect' : 'effects'}
               {activeCategory !== 'all' && activeCategory !== 'favorites' && (
@@ -423,10 +432,11 @@ export function EffectsShowcase() {
               )}
             </p>
 
-            <span className="text-xs text-muted-foreground/70 hidden sm:inline">
-              Tip: Click any card to interact live in Studio
+            <span className="text-[11px] sm:text-xs text-muted-foreground/70">
+              Tip: Tap any card to interact live in Studio
             </span>
           </div>
+
 
           {/* Effects Cards Grid */}
           <AnimatePresence mode="wait">
@@ -481,10 +491,14 @@ export function EffectsShowcase() {
       <footer className="mt-auto border-t border-border/50 bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
+            <button
+              onClick={scrollToTop}
+              className="flex items-center gap-2 hover:opacity-85 transition-opacity cursor-pointer focus:outline-none"
+              title="Back to top"
+            >
               <Logo size={24} />
               <span className="text-sm font-semibold">CSSHUB</span>
-            </div>
+            </button>
             <p className="text-xs text-muted-foreground">
               CSSHUB &middot; {allEffects.length} pure CSS effects &middot; 8-Way Resizable Studio &middot; Export CSS
             </p>

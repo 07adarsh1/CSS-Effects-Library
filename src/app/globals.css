@@ -146,6 +146,12 @@ pre::-webkit-scrollbar-thumb:hover {
   background: oklch(0.5 0 0);
 }
 
+/* Mobile touch safety */
+html,
+body {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
@@ -156,3 +162,5 @@ html {
   background: oklch(0.7 0.15 75);
   color: white;
 }
+
+
